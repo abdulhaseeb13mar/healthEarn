@@ -21,6 +21,8 @@ function MaterialMessageTextbox(props) {
       <TextInput
         secureTextEntry={props.isPassword}
         placeholder={props.textInput1 || 'Input'}
+        onChangeText={text => props.handleChange(text)}
+        value={props.value}
         style={[
           styles.inputStyle,
           {

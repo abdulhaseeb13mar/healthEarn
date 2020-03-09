@@ -19,7 +19,10 @@ function MaterialMessageTextbox(props) {
         {props.text1 || 'Label'}
       </Text>
       <TextInput
+        secureTextEntry={props.isPassword}
         placeholder={props.textInput1 || 'Input'}
+        onChangeText={text => props.handleChange(text)}
+        value={props.value}
         style={[
           styles.inputStyle,
           {
@@ -63,19 +66,20 @@ const styles = StyleSheet.create({
   },
   label: {
     paddingTop: 16,
-    fontSize: 12,
+    fontSize: 15,
     fontFamily: 'roboto-regular',
     textAlign: 'left',
   },
   inputStyle: {
-    width: 275,
+    width: '100%',
     flex: 1,
     color: '#000',
-    alignSelf: 'stretch',
+    alignSelf: 'center',
     paddingTop: 8,
     paddingBottom: 8,
-    borderColor: '#D9D5DC',
-    borderBottomWidth: 1,
+    //borderColor: '#D9D5DC',
+    borderBottomColor: '#3F51B5',
+    borderBottomWidth: 2,
     fontSize: 16,
     fontFamily: 'roboto-regular',
     lineHeight: 16,

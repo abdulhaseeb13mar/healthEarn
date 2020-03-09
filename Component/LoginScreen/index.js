@@ -1,1 +1,1 @@
-export { default as Untitled2 } from "./src/screens/Untitled2.js";
+export { default as Untitled1 } from "./src/screens/Untitled1.js";

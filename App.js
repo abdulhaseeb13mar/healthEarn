@@ -30,8 +30,8 @@ const App: () => React$Node = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        <Stack.Screen name="Signup" component={signup} />
         <Stack.Screen name="Login" component={login} />
+        <Stack.Screen name="Signup" component={signup} />
         <Stack.Screen name="Home" component={home} />
         <Stack.Screen name="StepScreen" component={stepScreen} />
       </Stack.Navigator>

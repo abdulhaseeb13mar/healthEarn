@@ -1,13 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 //import {ScrollView} from 'react-native-gesture-handler';
 
 function Untitled1(props) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <Image
           source={require('../assets/images/HealthEarnLogo.png')}
@@ -18,25 +21,39 @@ function Untitled1(props) {
           text1="Username"
           textInput1="Enter your username"
           style={styles.signupUsername}
+          handleChange={text => {
+            setUsername(text);
+          }}
+          value={username}
         />
         <MaterialMessageTextbox
           text1="Password"
           textInput1="Enter your password"
           style={styles.signupPassword}
+          handleChange={text => {
+            setPassword(text);
+          }}
+          value={password}
           isPassword={true}
         />
         {/* <Text style={styles.error}>Error</Text> */}
-        <MaterialMessageTextbox
+        {/* <MaterialMessageTextbox
           text1="Seed"
           textInput1="Enter your Seed Address"
           style={styles.signupSeed}
+        /> */}
+        <MaterialButtonViolet
+          onPress={() => {
+            Alert.alert(username, password);
+          }}
+          text1="Sign Up"
+          style={styles.signupButton}
         />
-        <MaterialButtonViolet text1="Sign Up" style={styles.signupButton} />
         <Text style={styles.alreadyText}>
           Already have an account?{' '}
           <Text
             onPress={() => {
-              Alert.alert('hello');
+              Alert.alert(username, password);
             }}
             style={{color: '#3F51B5', fontWeight: 'bold'}}>
             Log In here
@@ -49,12 +66,13 @@ function Untitled1(props) {
 
 const styles = StyleSheet.create({
   container: {
+    height: '100%',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
   },
   image: {
-    marginTop: '2%',
+    marginTop: '10%',
     width: '60%',
     height: 150,
     alignSelf: 'center',
@@ -87,7 +105,7 @@ const styles = StyleSheet.create({
   signupButton: {
     width: '75%',
     height: 50,
-    marginTop: '4%',
+    marginTop: '6%',
     //marginLeft: 50,
     alignSelf: 'center',
   },
@@ -119,7 +137,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#121212',
     fontFamily: 'roboto-regular',
-    marginTop: '3.5%',
+    marginTop: '5%',
     //marginLeft: 53,
     alignSelf: 'center',
     paddingBottom: 10,
