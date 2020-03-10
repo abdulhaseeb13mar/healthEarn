@@ -3,11 +3,19 @@ import React, {useState} from 'react';
 import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-//import {ScrollView} from 'react-native-gesture-handler';
+import firebase from '../../../../firebase';
 
 function Untitled1(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const signUp = () => {
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(username, password)
+      .then(createdUser => console.log(createdUser))
+      .catch(err => console.log(err.message));
+  };
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
@@ -45,6 +53,7 @@ function Untitled1(props) {
         <MaterialButtonViolet
           onPress={() => {
             Alert.alert(username, password);
+            signUp();
           }}
           text1="Sign Up"
           style={styles.signupButton}
