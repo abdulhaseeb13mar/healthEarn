@@ -3,11 +3,37 @@ import React, {useState} from 'react';
 import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-//import {ScrollView} from 'react-native-gesture-handler';
+import firebase from '../../../../firebase';
 
 function Untitled1(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameErrMsg, setUsernameErrMsg] = useState('');
+  const [passwordErrMsg, setPasswordErrMsg] = useState('');
+
+  const Login = () => {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(username, password)
+      .then(signedInUser => {
+        console.log(signedInUser);
+        setUsernameErrMsg('');
+        setPasswordErrMsg('');
+      })
+      .catch(err => {
+        console.log(err.message);
+        if (err.message.includes('email')) {
+          setUsernameErrMsg(err.message);
+          setPasswordErrMsg('');
+        } else if (err.message.includes('password')) {
+          setPasswordErrMsg('Incorrect password');
+          setUsernameErrMsg('');
+        } else if (err.message.includes('identifier')) {
+          setUsernameErrMsg('User Does not Exist');
+          setPasswordErrMsg('');
+        }
+      });
+  };
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
@@ -20,6 +46,8 @@ function Untitled1(props) {
           text1="Username"
           textInput1="Enter your username"
           style={styles.signupUsername}
+          error={usernameErrMsg ? true : false}
+          errorMessage={usernameErrMsg ? usernameErrMsg : null}
           handleChange={text => {
             setUsername(text);
           }}
@@ -28,6 +56,8 @@ function Untitled1(props) {
         <MaterialMessageTextbox
           text1="Password"
           textInput1="Enter your password"
+          error={passwordErrMsg ? true : false}
+          errorMessage={passwordErrMsg ? passwordErrMsg : null}
           style={styles.signupPassword}
           isPassword={true}
           handleChange={text => {
@@ -43,7 +73,7 @@ function Untitled1(props) {
         /> */}
         <MaterialButtonViolet
           onPress={() => {
-            Alert.alert(username, password);
+            Login();
           }}
           text1="Log In"
           style={styles.signupButton}
@@ -52,7 +82,7 @@ function Untitled1(props) {
           Don't have an account?{' '}
           <Text
             onPress={() => {
-              Alert.alert('hello');
+              props.navigation.navigate('Signup');
             }}
             style={{color: '#3F51B5', fontWeight: 'bold'}}>
             Sign Up here
@@ -68,7 +98,7 @@ const styles = StyleSheet.create({
     height: '100%',
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   image: {
     marginTop: '10%',
@@ -78,7 +108,7 @@ const styles = StyleSheet.create({
   },
   signupUsername: {
     width: '75%',
-    height: 74,
+    height: '20%',
     shadowOffset: {
       height: 5,
       width: 5,
@@ -90,7 +120,7 @@ const styles = StyleSheet.create({
   },
   signupPassword: {
     width: '75%',
-    height: 74,
+    height: '20%',
     shadowOffset: {
       height: 5,
       width: 5,
@@ -136,10 +166,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#121212',
     fontFamily: 'roboto-regular',
-    marginTop: '5%',
+    marginTop: '2%',
     //marginLeft: 53,
     alignSelf: 'center',
-    paddingBottom: 10,
+    marginBottom: '5%',
   },
 });
 

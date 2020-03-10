@@ -30,7 +30,7 @@ function MaterialMessageTextbox(props) {
               ? 'red'
               : props.success
               ? 'green'
-              : '#D9D5DC',
+              : '#3F51B5',
           },
         ]}
       />
@@ -42,7 +42,7 @@ function MaterialMessageTextbox(props) {
               color: props.error ? 'red' : 'transparent',
             },
           ]}>
-          Error message
+          {props.errorMessage}
         </Text>
       ) : null}
       {props.success ? (
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   label: {
-    paddingTop: 16,
+    marginTop: 16,
     fontSize: 15,
     fontFamily: 'roboto-regular',
     textAlign: 'left',
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#000',
     alignSelf: 'center',
-    paddingTop: 8,
-    paddingBottom: 8,
+    marginTop: 0,
+    marginBottom: 8,
     //borderColor: '#D9D5DC',
     borderBottomColor: '#3F51B5',
     borderBottomWidth: 2,
@@ -85,13 +85,13 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   helper1: {
-    paddingTop: 8,
+    marginTop: 0,
     fontSize: 12,
     fontFamily: 'roboto-regular',
     textAlign: 'left',
   },
   helper2: {
-    paddingTop: 8,
+    marginTop: 8,
     fontSize: 12,
     fontFamily: 'roboto-regular',
     textAlign: 'left',
