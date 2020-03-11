@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
+import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import firebase from '../../../../firebase';
@@ -10,30 +10,51 @@ function Untitled1(props) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [emailErrMsg, setemailErrMsg] = useState('');
+  const [usernameErrMsg, setUsernameErrMsg] = useState(false);
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
   const signUp = () => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(username, password)
-      .then(createdUser => {
-        setLoading(false);
-        console.log(createdUser);
-        setemailErrMsg('');
-        setPasswordErrMsg('');
-      })
-      .catch(err => {
-        setLoading(false);
-        console.log(err.message);
-        if (err.message.includes('email')) {
-          setemailErrMsg(err.message);
-          setPasswordErrMsg('');
-        } else if (err.message.includes('Password')) {
-          setPasswordErrMsg(err.message);
+    if (isFormValid()) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(createdUser => {
+          createdUser.user.updateProfile({
+            displayName: username,
+          });
+          setLoading(false);
           setemailErrMsg('');
-        }
-      });
+          setPasswordErrMsg('');
+          setUsernameErrMsg('');
+          console.log(createdUser);
+        })
+        .catch(err => {
+          setLoading(false);
+          console.log(err.message);
+          if (err.message.includes('email')) {
+            setemailErrMsg('User with this email already Exists');
+            setPasswordErrMsg('');
+            setUsernameErrMsg('');
+          } else if (err.message.includes('Password')) {
+            setPasswordErrMsg(err.message);
+            setUsernameErrMsg('');
+            setemailErrMsg('');
+          }
+        });
+    } else {
+      console.log('hello');
+
+      setLoading(false);
+      setUsernameErrMsg('Please Enter Your Name');
+    }
+  };
+  const isFormValid = () => {
+    if (username !== '') {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   return (
@@ -46,10 +67,10 @@ function Untitled1(props) {
         />
         <MaterialMessageTextbox
           text1="Username"
-          textInput1="Enter your username"
+          textInput1="Enter your Name"
           style={styles.signupUsername}
-          //error={usernameErrMsg ? true : false}
-          //errorMessage={usernameErrMsg ? usernameErrMsg : null}
+          error={usernameErrMsg ? true : false}
+          errorMessage={usernameErrMsg ? usernameErrMsg : null}
           handleChange={text => {
             setUsername(text);
           }}
@@ -78,12 +99,6 @@ function Untitled1(props) {
           value={password}
           isPassword={true}
         />
-        {/* <Text style={styles.error}>Error</Text> */}
-        {/* <MaterialMessageTextbox
-          text1="Seed"
-          textInput1="Enter your Seed Address"
-          style={styles.signupSeed}
-        /> */}
         <MaterialButtonViolet
           onPress={() => {
             setLoading(true);
@@ -116,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   image: {
-    marginTop: '1%',
+    marginTop: '5%',
     width: '60%',
     height: 150,
     alignSelf: 'center',

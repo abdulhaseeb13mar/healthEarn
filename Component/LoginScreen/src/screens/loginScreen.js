@@ -6,8 +6,9 @@ import {
   Image,
   Text,
   ScrollView,
-  Alert,
   AsyncStorage,
+  Button,
+  KeyboardAvoidingView,
 } from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
@@ -48,10 +49,18 @@ function Untitled1(props) {
       .auth()
       .signInWithEmailAndPassword(username, password)
       .then(signedInUser => {
-        setLoading(false);
         console.log(signedInUser);
         setUsernameErrMsg('');
         setPasswordErrMsg('');
+        AsyncStorage.multiSet(
+          [
+            ['name', signedInUser.user.displayName],
+            ['email', signedInUser.user.email],
+            ['uid', signedInUser.user.uid],
+          ],
+          error => console.log('setData error:', error),
+        );
+        setLoading(false);
       })
       .catch(err => {
         setLoading(false);
@@ -68,70 +77,87 @@ function Untitled1(props) {
         }
       });
   };
+
+  const clearData = () => {
+    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
+      console.log('clearData error:', error),
+    );
+  };
+
+  const fetchdata = () => {
+    AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
+      console.log('fetch data erorr:', error);
+      stores.map((result, i, store) => {
+        // get at each store's key/value so you can work with it
+        console.log(store[i][0], store[i][1]);
+      });
+    });
+  };
   return (
-    <ScrollView keyboardShouldPersistTaps="handled">
-      <View style={styles.container}>
-        <Image
-          source={require('../assets/images/HealthEarnLogo.png')}
-          resizeMode="contain"
-          style={styles.image}
-        />
-        <MaterialMessageTextbox
-          text1="Username"
-          textInput1="Enter your username"
-          style={styles.signupUsername}
-          error={usernameErrMsg ? true : false}
-          errorMessage={usernameErrMsg ? usernameErrMsg : null}
-          handleChange={text => {
-            setUsername(text);
-          }}
-          value={username}
-        />
-        <MaterialMessageTextbox
-          text1="Password"
-          textInput1="Enter your password"
-          error={passwordErrMsg ? true : false}
-          errorMessage={passwordErrMsg ? passwordErrMsg : null}
-          style={styles.signupPassword}
-          isPassword={true}
-          handleChange={text => {
-            setPassword(text);
-          }}
-          value={password}
-        />
-        {/* <Text style={styles.error}>Error</Text> */}
-        {/* <MaterialMessageTextbox
+    <KeyboardAvoidingView behavior="height">
+      <ScrollView keyboardShouldPersistTaps="handled">
+        <View style={styles.container}>
+          <Image
+            source={require('../assets/images/HealthEarnLogo.png')}
+            resizeMode="contain"
+            style={styles.image}
+          />
+          <MaterialMessageTextbox
+            text1="Username"
+            textInput1="Enter your username"
+            style={styles.signupUsername}
+            error={usernameErrMsg ? true : false}
+            errorMessage={usernameErrMsg ? usernameErrMsg : null}
+            handleChange={text => {
+              setUsername(text);
+            }}
+            value={username}
+          />
+          <MaterialMessageTextbox
+            text1="Password"
+            textInput1="Enter your password"
+            error={passwordErrMsg ? true : false}
+            errorMessage={passwordErrMsg ? passwordErrMsg : null}
+            style={styles.signupPassword}
+            isPassword={true}
+            handleChange={text => {
+              setPassword(text);
+            }}
+            value={password}
+          />
+          {/* <Text style={styles.error}>Error</Text> */}
+          {/* <MaterialMessageTextbox
           text1="Seed"
           textInput1="Enter your Seed Address"
           style={styles.signupSeed}
         /> */}
-        <MaterialButtonViolet
-          onPress={() => {
-            setLoading(true);
-            Login();
-          }}
-          text1="Log In"
-          style={styles.signupButton}
-          isLoading={loading}
-        />
-        <Text style={styles.alreadyText}>
-          Don't have an account?{' '}
-          <Text
+          <MaterialButtonViolet
             onPress={() => {
-              props.navigation.navigate('Signup');
+              setLoading(true);
+              Login();
             }}
-            style={{color: '#3F51B5', fontWeight: 'bold'}}>
-            Sign Up here
+            text1="Log In"
+            style={styles.signupButton}
+            isLoading={loading}
+          />
+          <Text style={styles.alreadyText}>
+            Don't have an account?{' '}
+            <Text
+              onPress={() => {
+                props.navigation.navigate('Signup');
+              }}
+              style={{color: '#3F51B5', fontWeight: 'bold'}}>
+              Sign Up here
+            </Text>
           </Text>
-        </Text>
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
