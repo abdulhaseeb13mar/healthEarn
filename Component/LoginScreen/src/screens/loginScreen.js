@@ -1,6 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  ScrollView,
+  Alert,
+  AsyncStorage,
+} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import firebase from '../../../../firebase';
@@ -10,17 +18,43 @@ function Untitled1(props) {
   const [password, setPassword] = useState('');
   const [usernameErrMsg, setUsernameErrMsg] = useState('');
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+  const h = {
+    additionalUserInfo: {isNewUser: false, providerId: 'password'},
+    credential: null,
+    operationType: 'signIn',
+    user: {
+      apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
+      appName: '[DEFAULT]',
+      authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
+      createdAt: '1583921451578',
+      displayName: null,
+      email: 'abdulhaseeb13mar@gmail.com',
+      emailVerified: false,
+      isAnonymous: false,
+      lastLoginAt: '1583932943491',
+      phoneNumber: null,
+      photoURL: null,
+      providerData: [Array],
+      redirectEventId: null,
+      stsTokenManager: [Object],
+      tenantId: null,
+      uid: 'Hxw1QTM5kObtUerbjZzkyr76amo2',
+    },
+  };
 
   const Login = () => {
     firebase
       .auth()
       .signInWithEmailAndPassword(username, password)
       .then(signedInUser => {
+        setLoading(false);
         console.log(signedInUser);
         setUsernameErrMsg('');
         setPasswordErrMsg('');
       })
       .catch(err => {
+        setLoading(false);
         console.log(err.message);
         if (err.message.includes('email')) {
           setUsernameErrMsg(err.message);
@@ -73,10 +107,12 @@ function Untitled1(props) {
         /> */}
         <MaterialButtonViolet
           onPress={() => {
+            setLoading(true);
             Login();
           }}
           text1="Log In"
           style={styles.signupButton}
+          isLoading={loading}
         />
         <Text style={styles.alreadyText}>
           Don't have an account?{' '}

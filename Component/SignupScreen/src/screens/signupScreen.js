@@ -8,26 +8,30 @@ import firebase from '../../../../firebase';
 function Untitled1(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [usernameErrMsg, setUsernameErrMsg] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailErrMsg, setemailErrMsg] = useState('');
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const signUp = () => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(username, password)
       .then(createdUser => {
+        setLoading(false);
         console.log(createdUser);
-        setUsernameErrMsg('');
+        setemailErrMsg('');
         setPasswordErrMsg('');
       })
       .catch(err => {
+        setLoading(false);
         console.log(err.message);
         if (err.message.includes('email')) {
-          setUsernameErrMsg(err.message);
+          setemailErrMsg(err.message);
           setPasswordErrMsg('');
         } else if (err.message.includes('Password')) {
           setPasswordErrMsg(err.message);
-          setUsernameErrMsg('');
+          setemailErrMsg('');
         }
       });
   };
@@ -44,12 +48,23 @@ function Untitled1(props) {
           text1="Username"
           textInput1="Enter your username"
           style={styles.signupUsername}
-          error={usernameErrMsg ? true : false}
-          errorMessage={usernameErrMsg ? usernameErrMsg : null}
+          //error={usernameErrMsg ? true : false}
+          //errorMessage={usernameErrMsg ? usernameErrMsg : null}
           handleChange={text => {
             setUsername(text);
           }}
           value={username}
+        />
+        <MaterialMessageTextbox
+          text1="Email"
+          textInput1="Enter your email address"
+          style={styles.signupEmail}
+          error={emailErrMsg ? true : false}
+          errorMessage={emailErrMsg ? emailErrMsg : null}
+          handleChange={text => {
+            setEmail(text);
+          }}
+          value={email}
         />
         <MaterialMessageTextbox
           text1="Password"
@@ -71,10 +86,12 @@ function Untitled1(props) {
         /> */}
         <MaterialButtonViolet
           onPress={() => {
+            setLoading(true);
             signUp();
           }}
           text1="Sign Up"
           style={styles.signupButton}
+          isLoading={loading}
         />
         <Text style={styles.alreadyText}>
           Already have an account?{' '}
@@ -99,12 +116,24 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   image: {
-    marginTop: '10%',
+    marginTop: '1%',
     width: '60%',
     height: 150,
     alignSelf: 'center',
   },
   signupUsername: {
+    width: '75%',
+    height: '20%',
+    shadowOffset: {
+      height: 5,
+      width: 5,
+    },
+    shadowColor: 'rgba(0,0,0,1)',
+    shadowOpacity: 0.01,
+    //marginLeft: 62,
+    alignSelf: 'center',
+  },
+  signupEmail: {
     width: '75%',
     height: '20%',
     shadowOffset: {
@@ -132,7 +161,7 @@ const styles = StyleSheet.create({
   signupButton: {
     width: '75%',
     height: 50,
-    marginTop: '6%',
+    marginTop: '3%',
     //marginLeft: 50,
     alignSelf: 'center',
   },
@@ -147,19 +176,6 @@ const styles = StyleSheet.create({
     marginTop: -317,
     marginLeft: 62,
   },
-  signupSeed: {
-    width: '75%',
-    height: 74,
-    shadowOffset: {
-      height: 5,
-      width: 5,
-    },
-    shadowColor: 'rgba(0,0,0,1)',
-    shadowOpacity: 0.01,
-    marginTop: '3.5%',
-    //marginLeft: 64,
-    alignSelf: 'center',
-  },
   alreadyText: {
     fontSize: 15,
     color: '#121212',
@@ -167,7 +183,7 @@ const styles = StyleSheet.create({
     marginTop: '2%',
     //marginLeft: 53,
     alignSelf: 'center',
-    marginBottom: '4%',
+    marginBottom: '10%',
   },
 });
 

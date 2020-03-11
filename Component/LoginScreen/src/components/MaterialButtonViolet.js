@@ -1,12 +1,17 @@
 import React, {Component} from 'react';
 import {StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {Pulse} from 'react-native-loader';
 
 function MaterialButtonViolet(props) {
   return (
     <TouchableOpacity
       onPress={props.onPress}
       style={[styles.container, props.style]}>
-      <Text style={styles.caption}>{props.text1 || 'BUTTON'}</Text>
+      {props.isLoading ? (
+        <Pulse size={20} color="#FFF" />
+      ) : (
+        <Text style={styles.caption}>{props.text1 || 'BUTTON'}</Text>
+      )}
     </TouchableOpacity>
   );
 }
