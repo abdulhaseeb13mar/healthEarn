@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   signupUsername: {
     width: '75%',
-    height: '20%',
+    height: 80,
     shadowOffset: {
       height: 5,
       width: 5,
@@ -134,34 +134,36 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   signupEmail: {
+    position: 'relative',
     width: '75%',
-    height: '20%',
+    height: 80,
     shadowOffset: {
       height: 5,
       width: 5,
     },
     shadowColor: 'rgba(0,0,0,1)',
     shadowOpacity: 0.01,
-    //marginLeft: 62,
+    marginTop: 10,
     alignSelf: 'center',
   },
   signupPassword: {
+    position: 'relative',
     width: '75%',
-    height: '20%',
+    height: 80,
     shadowOffset: {
       height: 5,
       width: 5,
     },
     shadowColor: 'rgba(0,0,0,1)',
     shadowOpacity: 0.01,
-    marginTop: '3.5%',
+    marginTop: 10,
     //marginLeft: 64,
     alignSelf: 'center',
   },
   signupButton: {
     width: '75%',
     height: 50,
-    marginTop: '3%',
+    marginTop: 10,
     //marginLeft: 50,
     alignSelf: 'center',
   },
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
     marginTop: '2%',
     //marginLeft: 53,
     alignSelf: 'center',
-    marginBottom: '10%',
+    marginBottom: '2%',
   },
 });
 
