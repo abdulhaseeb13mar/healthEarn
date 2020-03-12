@@ -1,6 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  ScrollView,
+  AsyncStorage,
+  Button,
+} from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import firebase from '../../../../firebase';
@@ -28,7 +36,17 @@ function Untitled1(props) {
           setPasswordErrMsg('');
           setUsernameErrMsg('');
           console.log(createdUser);
-          props.navigation.navigate('HomeScreen');
+          AsyncStorage.multiSet(
+            [
+              ['name', username],
+              ['email', email],
+              ['uid', createdUser.user.uid],
+            ],
+            error => {
+              console.log('setData error:', error);
+            },
+          );
+          props.userToken();
         })
         .catch(err => {
           setLoading(false);
@@ -57,6 +75,11 @@ function Untitled1(props) {
       return false;
     }
   };
+  const clearUserToken = () => {
+    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
+      console.log('clearData error:', error),
+    );
+  };
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
@@ -66,6 +89,8 @@ function Untitled1(props) {
           resizeMode="contain"
           style={styles.image}
         />
+        <Button title="fetch" onPress={() => fetchUserToken()} />
+        <Button title="clear" onPress={() => clearUserToken()} />
         <MaterialMessageTextbox
           text1="Username"
           textInput1="Enter your Name"
@@ -205,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Untitled1;
+export default React.memo(Untitled1);

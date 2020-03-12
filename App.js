@@ -10,21 +10,21 @@ import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import home from './Component/home';
-import login from './Component/LoginScreen/src/screens/loginScreen';
-import signup from './Component/SignupScreen/src/screens/signupScreen';
-import stepScreen from './Component/stepScreen/src/screens/stepScreen';
+import Login from './Component/LoginScreen/src/screens/loginScreen';
+import Signup from './Component/SignupScreen/src/screens/signupScreen';
+import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 import {AsyncStorage} from 'react-native';
 
 const Stack = createStackNavigator();
 const App: () => React$Node = () => {
   const [userToken, setUserToken] = useState(null);
   useEffect(() => {
-    fetchdata();
+    fetchUserToken();
   }, []);
 
-  const fetchdata = () => {
-    AsyncStorage.getItem('uid', (error, result) => {
-      console.log('FetchData Error:', error);
+  const fetchUserToken = async () => {
+    await AsyncStorage.getItem('uid', (error, result) => {
+      console.log('FetchData Error app wala:', error);
       setUserToken(result);
       console.log(result);
     });
@@ -34,14 +34,22 @@ const App: () => React$Node = () => {
       <Stack.Navigator headerMode="none">
         {userToken == null ? (
           <>
-            <Stack.Screen name="Login" component={login} />
-            <Stack.Screen name="Signup" component={signup} />
-            <Stack.Screen name="HomeScreen" component={stepScreen} />
+            <Stack.Screen name="Login">
+              {props => <Login {...props} userToken={() => fetchUserToken()} />}
+            </Stack.Screen>
+            <Stack.Screen name="Signup">
+              {props => (
+                <Signup {...props} userToken={() => fetchUserToken()} />
+              )}
+            </Stack.Screen>
           </>
         ) : (
-          <Stack.Screen name="HomeScreen" component={stepScreen} />
+          <Stack.Screen name="HomeScreen">
+            {props => (
+              <StepScreen {...props} userToken={() => fetchUserToken()} />
+            )}
+          </Stack.Screen>
         )}
-        {/* <Stack.Screen name="Home" component={home} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

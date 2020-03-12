@@ -235,4 +235,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Untitled1;
+export default React.memo(Untitled1);

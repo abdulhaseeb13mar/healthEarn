@@ -242,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Untitled;
+export default React.memo(Untitled);
