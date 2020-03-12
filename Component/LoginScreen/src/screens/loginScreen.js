@@ -61,6 +61,7 @@ function Untitled1(props) {
           error => console.log('setData error:', error),
         );
         setLoading(false);
+        props.userToken();
       })
       .catch(err => {
         setLoading(false);

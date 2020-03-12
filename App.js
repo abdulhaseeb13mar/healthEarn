@@ -9,7 +9,7 @@ import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import home from './Component/home';
+// import home from './Component/home';
 import Login from './Component/LoginScreen/src/screens/loginScreen';
 import Signup from './Component/SignupScreen/src/screens/signupScreen';
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';

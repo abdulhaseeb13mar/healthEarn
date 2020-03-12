@@ -119,10 +119,11 @@ function Untitled(props) {
       });
   };
 
-  const clearData = () => {
-    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
+  const clearData = async () => {
+    await AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
       console.log('clearData error:', error),
     );
+    props.userToken();
   };
   return (
     <KeyboardAvoidingView
