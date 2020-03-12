@@ -28,6 +28,7 @@ function Untitled1(props) {
           setPasswordErrMsg('');
           setUsernameErrMsg('');
           console.log(createdUser);
+          props.navigation.navigate('HomeScreen');
         })
         .catch(err => {
           setLoading(false);

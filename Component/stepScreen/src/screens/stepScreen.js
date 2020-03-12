@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   Alert,
   KeyboardAvoidingView,
+  Button,
+  AsyncStorage,
 } from 'react-native';
 import MaterialButtonTransparentHamburger from '../components/MaterialButtonTransparentHamburger';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
@@ -17,19 +19,22 @@ import GoogleFit from 'react-native-google-fit';
 import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
+import {DoubleBounce} from 'react-native-loader';
 
 function Untitled(props) {
   const [count, setCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     console.log('component mounted');
+    setIsLoading(true);
     locationAuthorize();
     return () => {
       GoogleFit.unsubscribeListeners();
       console.log('will unmount');
     };
   }, []);
+
   async function locationAuthorize() {
-    console.log('here');
     const options = {
       scopes: [
         localScopes.FITNESS_ACTIVITY_READ_WRITE,
@@ -38,10 +43,8 @@ function Untitled(props) {
     };
     await GoogleFit.authorize(options)
       .then(async authResult => {
-        console.log('inside then', authResult);
         if (authResult.success) {
           let loc_perm = await requestLocationPermission();
-          console.log('object');
           if (loc_perm) {
             GoogleFit.startRecording(x => {
               console.log(x);
@@ -53,7 +56,6 @@ function Untitled(props) {
         console.log(e);
         Alert.alert('error');
       });
-    console.log('out');
     stepsRetriever();
   }
 
@@ -96,7 +98,6 @@ function Untitled(props) {
       ).toISOString(),
       endDate: new Date().toISOString(), // required ISO8601Timestamp
     };
-    console.log(retrieveOptions);
 
     GoogleFit.getDailyStepCountSamples(retrieveOptions)
       .then(res => {
@@ -108,6 +109,7 @@ function Untitled(props) {
               ? setCount(res[i].steps[0].value)
               : setCount(0);
             console.log(res[i].steps[0].value);
+            setIsLoading(false);
             break;
           }
         }
@@ -115,6 +117,12 @@ function Untitled(props) {
       .catch(err => {
         console.log(err);
       });
+  };
+
+  const clearData = () => {
+    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
+      console.log('clearData error:', error),
+    );
   };
   return (
     <KeyboardAvoidingView
@@ -130,7 +138,9 @@ function Untitled(props) {
             <Text style={styles.UpperLine}>Today you have walked:</Text>
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
-                {count ? (
+                {isLoading ? (
+                  <DoubleBounce size={15} color="#0000" />
+                ) : (
                   <AnimateNumber
                     initial={1}
                     value={count}
@@ -144,22 +154,21 @@ function Untitled(props) {
                       return parseInt(val);
                     }}
                   />
-                ) : null}
+                )}
               </Text>
               <Text style={styles.stepsToday}>Steps</Text>
             </Text>
             <MaterialButtonViolet
-              onPress={() => stepsRetriever()}
+              onPress={() => {
+                setIsLoading(true);
+                stepsRetriever();
+              }}
               style={styles.materialButtonViolet}
             />
             {/* <Icon name="reload" style={styles.icon} /> */}
           </View>
-          <MaterialMessageTextbox
-            text1="Username"
-            textInput1="Enter your username"
-            style={styles.materialMessageTextbox}
-          />
         </View>
+        <Button title="clear" onPress={() => clearData()} />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
