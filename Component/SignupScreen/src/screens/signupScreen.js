@@ -52,7 +52,7 @@ function Untitled1(props) {
           setLoading(false);
           console.log(err.message);
           if (err.message.includes('email')) {
-            setemailErrMsg('User with this email already Exists');
+            setemailErrMsg(err.message);
             setPasswordErrMsg('');
             setUsernameErrMsg('');
           } else if (err.message.includes('Password')) {
