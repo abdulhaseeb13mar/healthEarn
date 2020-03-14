@@ -11,6 +11,7 @@ import {
   Button,
   AsyncStorage,
 } from 'react-native';
+import {Header, Left} from 'native-base';
 import MaterialButtonTransparentHamburger from '../components/MaterialButtonTransparentHamburger';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -188,10 +189,15 @@ function Untitled(props) {
         </View>
         <View>
           <Icon
+            name="menu"
+            size={40}
+            onPress={() => props.navigation.openDrawer()}
+          />
+          {/* <Icon
             onPress={() => console.log(currentUser)}
             name="logout"
             size={40}
-          />
+          /> */}
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>

@@ -104,8 +104,8 @@ function Untitled1(props) {
             style={styles.image}
           />
           <MaterialMessageTextbox
-            text1="Username"
-            textInput1="Enter your username"
+            text1="Email"
+            textInput1="Enter your email address"
             style={styles.signupUsername}
             error={usernameErrMsg ? true : false}
             errorMessage={usernameErrMsg ? usernameErrMsg : null}

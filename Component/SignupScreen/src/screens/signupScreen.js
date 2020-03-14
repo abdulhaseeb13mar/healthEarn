@@ -89,7 +89,6 @@ function Untitled1(props) {
           resizeMode="contain"
           style={styles.image}
         />
-        <Button title="clear" onPress={() => clearUserToken()} />
         <MaterialMessageTextbox
           text1="Username"
           textInput1="Enter your Name"
