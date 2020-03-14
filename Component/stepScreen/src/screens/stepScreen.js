@@ -20,14 +20,17 @@ import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
 import {DoubleBounce} from 'react-native-loader';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState({});
   useEffect(() => {
     console.log('component mounted');
     setIsLoading(true);
     locationAuthorize();
+    fetchUserToken();
     return () => {
       GoogleFit.unsubscribeListeners();
       console.log('will unmount');
@@ -119,12 +122,25 @@ function Untitled(props) {
       });
   };
 
-  const clearData = async () => {
+  const clearUserToken = async () => {
     await AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
       console.log('clearData error:', error),
     );
     props.userToken();
   };
+
+  const fetchUserToken = async () => {
+    let userinfo = {};
+    await AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
+      console.log('fetch data erorr:', error);
+      stores.map((_, i, store) => {
+        userinfo = {...userinfo, [store[i][0]]: store[i][1]};
+        console.log(userinfo);
+      });
+    });
+    setCurrentUser(userinfo);
+  };
+
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={10}
@@ -132,10 +148,11 @@ function Untitled(props) {
       style={{flex: 1}}>
       <SafeAreaView>
         <View style={styles.container}>
-          <MaterialButtonTransparentHamburger
+          {/* <MaterialButtonTransparentHamburger
             style={styles.materialButtonTransparentHamburger}
-          />
+          /> */}
           <View style={styles.innerContainer}>
+            <Text style={styles.UpperLine}>Hello {currentUser.name}</Text>
             <Text style={styles.UpperLine}>Today you have walked:</Text>
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
@@ -169,7 +186,13 @@ function Untitled(props) {
             {/* <Icon name="reload" style={styles.icon} /> */}
           </View>
         </View>
-        <Button title="clear" onPress={() => clearData()} />
+        <View>
+          <Icon
+            onPress={() => console.log(currentUser)}
+            name="logout"
+            size={40}
+          />
+        </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

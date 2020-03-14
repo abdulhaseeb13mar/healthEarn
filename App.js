@@ -12,8 +12,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import home from './Component/home';
 import Login from './Component/LoginScreen/src/screens/loginScreen';
 import Signup from './Component/SignupScreen/src/screens/signupScreen';
-import StepScreen from './Component/stepScreen/src/screens/stepScreen';
+// import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 import {AsyncStorage} from 'react-native';
+import HomeScreen from './HomeNavigations';
 
 const Stack = createStackNavigator();
 const App: () => React$Node = () => {
@@ -46,7 +47,7 @@ const App: () => React$Node = () => {
         ) : (
           <Stack.Screen name="HomeScreen">
             {props => (
-              <StepScreen {...props} userToken={() => fetchUserToken()} />
+              <HomeScreen {...props} userToken={() => fetchUserToken()} />
             )}
           </Stack.Screen>
         )}
