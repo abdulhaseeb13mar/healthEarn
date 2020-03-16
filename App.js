@@ -18,26 +18,31 @@ import SplashScreen from './Component/splashScreen';
 
 const Stack = createStackNavigator();
 const App: () => React$Node = () => {
-  const [userToken, setUserToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState({});
   useEffect(() => {
     fetchUserToken();
   }, []);
 
   const fetchUserToken = async () => {
-    await AsyncStorage.getItem('uid', (error, result) => {
+    let userinfo = {};
+    await AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
       if (error === null) {
+        stores.map((_, i, store) => {
+          userinfo = {...userinfo, [store[i][0]]: store[i][1]};
+        });
         setIsLoading(false);
-        setUserToken(result);
+        setCurrentUser(userinfo);
       } else {
-        console.log('FetchData Error app wala:', error);
+        console.log('fetch data erorr:', error);
       }
     });
   };
+
   return isLoading === false ? (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        {userToken == null ? (
+        {currentUser.uid == null ? (
           <>
             <Stack.Screen name="Login">
               {props => <Login {...props} userToken={() => fetchUserToken()} />}
@@ -51,7 +56,11 @@ const App: () => React$Node = () => {
         ) : (
           <Stack.Screen name="HomeScreen">
             {props => (
-              <HomeScreen {...props} userToken={() => fetchUserToken()} />
+              <HomeScreen
+                {...props}
+                currentUser={currentUser}
+                userToken={() => fetchUserToken()}
+              />
             )}
           </Stack.Screen>
         )}

@@ -32,6 +32,7 @@ export default function HomeNavigations(props) {
         drawerContent={drawerComponentProps => (
           <CustomNavigator
             signout={() => clearUserToken()}
+            currentUser={props.currentUser}
             {...drawerComponentProps}
           />
         )}
@@ -51,8 +52,8 @@ export default function HomeNavigations(props) {
 const CustomNavigator = props => (
   <DrawerContentScrollView {...props}>
     <View style={styles.header}>
-      <Text style={styles.headerName}>ABDUL HASEEB</Text>
-      <Text style={styles.headerEmail}>abdulhaseeb13mar@gmail.com</Text>
+      <Text style={styles.headerName}>{props.currentUser.name}</Text>
+      <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
     </View>
     <DrawerItemList {...props} />
     <DrawerItem
