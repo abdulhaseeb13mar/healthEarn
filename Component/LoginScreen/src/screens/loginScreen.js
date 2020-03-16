@@ -20,34 +20,11 @@ function Untitled1(props) {
   const [usernameErrMsg, setUsernameErrMsg] = useState('');
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const h = {
-    additionalUserInfo: {isNewUser: false, providerId: 'password'},
-    credential: null,
-    operationType: 'signIn',
-    user: {
-      apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
-      appName: '[DEFAULT]',
-      authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
-      createdAt: '1583921451578',
-      displayName: null,
-      email: 'abdulhaseeb13mar@gmail.com',
-      emailVerified: false,
-      isAnonymous: false,
-      lastLoginAt: '1583932943491',
-      phoneNumber: null,
-      photoURL: null,
-      providerData: [Array],
-      redirectEventId: null,
-      stsTokenManager: [Object],
-      tenantId: null,
-      uid: 'Hxw1QTM5kObtUerbjZzkyr76amo2',
-    },
-  };
 
   const Login = () => {
     firebase
       .auth()
-      .signInWithEmailAndPassword(username, password)
+      .signInWithEmailAndPassword(username.trim(), password)
       .then(signedInUser => {
         console.log(signedInUser);
         setUsernameErrMsg('');
@@ -60,7 +37,6 @@ function Untitled1(props) {
           ],
           error => console.log('setData error:', error),
         );
-        setLoading(false);
         props.userToken();
       })
       .catch(err => {
@@ -237,3 +213,27 @@ const styles = StyleSheet.create({
 });
 
 export default React.memo(Untitled1);
+
+// const h = {
+//   additionalUserInfo: { isNewUser: false, providerId: 'password' },
+//   credential: null,
+//   operationType: 'signIn',
+//   user: {
+//     apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
+//     appName: '[DEFAULT]',
+//     authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
+//     createdAt: '1583921451578',
+//     displayName: null,
+//     email: 'abdulhaseeb13mar@gmail.com',
+//     emailVerified: false,
+//     isAnonymous: false,
+//     lastLoginAt: '1583932943491',
+//     phoneNumber: null,
+//     photoURL: null,
+//     providerData: [Array],
+//     redirectEventId: null,
+//     stsTokenManager: [Object],
+//     tenantId: null,
+//     uid: 'Hxw1QTM5kObtUerbjZzkyr76amo2',
+//   },
+// }

@@ -9,6 +9,7 @@ import {
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 import {Text, Dimensions, StyleSheet, View, AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+//import SplashScreen from './Component/splashScreen';
 
 const Drawer = createDrawerNavigator();
 const WIDTH = Dimensions.get('window').width;
@@ -55,13 +56,12 @@ const CustomNavigator = props => (
     </View>
     <DrawerItemList {...props} />
     <DrawerItem
-      label="Sign out"
+      label="Log out"
       inactiveBackgroundColor="yellow"
       activeBackgroundColor="blue"
       icon={() => <Icon size={25} name="logout" />}
       onPress={() => {
         props.signout();
-        //props.navigation.navigate('Home');
       }}
     />
   </DrawerContentScrollView>

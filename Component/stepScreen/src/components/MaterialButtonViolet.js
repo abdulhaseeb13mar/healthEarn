@@ -1,11 +1,19 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import {StyleSheet, TouchableOpacity, Text} from 'react-native';
 
 function MaterialButtonViolet(props) {
   return (
     <TouchableOpacity
+      disabled={props.isDisabled}
       onPress={props.onPress}
-      style={[styles.container, props.style]}>
+      style={[
+        styles.container,
+        props.style,
+        {
+          backgroundColor: props.isDisabled ? '#a4afeb' : '#3F51B5',
+        },
+      ]}>
       <Text style={styles.caption}>Refresh</Text>
     </TouchableOpacity>
   );

@@ -12,7 +12,6 @@ import {
   Button,
   AsyncStorage,
 } from 'react-native';
-import {Header, Left} from 'native-base';
 import MaterialButtonTransparentHamburger from '../components/MaterialButtonTransparentHamburger';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,6 +25,7 @@ function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
+  const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   useEffect(() => {
     console.log('component mounted');
     setIsLoading(true);
@@ -105,12 +105,14 @@ function Untitled(props) {
     GoogleFit.getDailyStepCountSamples(retrieveOptions)
       .then(res => {
         console.log(res);
-        //console.log(res[2].steps);
         for (let i = 0; i < res.length; i++) {
           if (res[i].source === 'com.google.android.gms:estimated_steps') {
             res[i].steps.length !== 0
               ? setCount(res[i].steps[0].value)
               : setCount(0);
+            setTimeout(() => {
+              setIsDisabledRefreshBtn(false);
+            }, 3500);
             console.log(res[i].steps[0].value);
             setIsLoading(false);
             break;
@@ -124,13 +126,14 @@ function Untitled(props) {
 
   const fetchUserToken = async () => {
     let userinfo = {};
-    await AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
-      console.log('fetch data erorr:', error);
-      stores.map((_, i, store) => {
-        userinfo = {...userinfo, [store[i][0]]: store[i][1]};
-        console.log(userinfo);
-      });
-    });
+    await AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) =>
+      error === null
+        ? stores.map((_, i, store) => {
+            userinfo = {...userinfo, [store[i][0]]: store[i][1]};
+            //console.log(userinfo);
+          })
+        : console.log('fetch data erorr:', error),
+    );
     setCurrentUser(userinfo);
   };
 
@@ -153,7 +156,6 @@ function Untitled(props) {
                   <DoubleBounce size={15} color="#0000" />
                 ) : (
                   <AnimateNumber
-                    initial={1}
                     value={count}
                     interval={14}
                     timing={(interval, progress) => {
@@ -172,8 +174,10 @@ function Untitled(props) {
             <MaterialButtonViolet
               onPress={() => {
                 setIsLoading(true);
+                setIsDisabledRefreshBtn(true);
                 stepsRetriever();
               }}
+              isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
             {/* <Icon name="reload" style={styles.icon} /> */}
