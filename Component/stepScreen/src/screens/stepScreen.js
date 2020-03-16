@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-unused-vars */
 import React, {Component, useState, useEffect} from 'react';
 import {
@@ -21,8 +22,6 @@ import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
 import {DoubleBounce} from 'react-native-loader';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-
 function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,13 +120,6 @@ function Untitled(props) {
       .catch(err => {
         console.log(err);
       });
-  };
-
-  const clearUserToken = async () => {
-    await AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
-      console.log('clearData error:', error),
-    );
-    props.userToken();
   };
 
   const fetchUserToken = async () => {
