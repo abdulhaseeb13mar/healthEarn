@@ -104,7 +104,7 @@ function Untitled(props) {
 
     GoogleFit.getDailyStepCountSamples(retrieveOptions)
       .then(res => {
-        console.log(res);
+        // console.log(res);
         //console.log(res[2].steps);
         for (let i = 0; i < res.length; i++) {
           if (res[i].source === 'com.google.android.gms:estimated_steps') {
