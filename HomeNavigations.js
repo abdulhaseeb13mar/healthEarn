@@ -7,7 +7,14 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';
-import {Text, Dimensions, StyleSheet, View, AsyncStorage} from 'react-native';
+import {
+  Text,
+  Dimensions,
+  StyleSheet,
+  View,
+  AsyncStorage,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HeartRateScreen from './Component/HeartRate';
 import SettingScreen from './Component/Settings';
@@ -39,12 +46,23 @@ export default function HomeNavigations(props) {
         )}
         drawerContentOptions={{
           activeBackgroundColor: '#bbc5f7',
-          activeTintColor: '#001480',
+          labelStyle: {
+            color: 'black',
+            fontSize: 17,
+            paddingLeft: '5%',
+            paddingBottom: '3%',
+          },
+          itemStyle: {
+            borderStyle: 'solid',
+            borderColor: 'transparent',
+            borderBottomColor: '#dcdcdc',
+            borderWidth: 1,
+          },
         }}>
         <Drawer.Screen
           name="Home"
           options={{
-            drawerIcon: () => <Icon name="home" size={25} />,
+            drawerIcon: () => <Icon name="home" size={27} />,
             unmountOnBlur: true,
           }}>
           {homeProps => (
@@ -54,7 +72,7 @@ export default function HomeNavigations(props) {
         <Drawer.Screen
           name="HeartRate"
           options={{
-            drawerIcon: () => <Icon name="heart" size={25} />,
+            drawerIcon: () => <Icon name="heart" size={27} />,
             unmountOnBlur: true,
             gestureEnabled: false,
           }}>
@@ -68,7 +86,7 @@ export default function HomeNavigations(props) {
         <Drawer.Screen
           name="Wallet"
           options={{
-            drawerIcon: () => <Icon name="wallet" size={25} />,
+            drawerIcon: () => <Icon name="wallet" size={27} />,
             unmountOnBlur: true,
             gestureEnabled: false,
           }}>
@@ -82,9 +100,9 @@ export default function HomeNavigations(props) {
         <Drawer.Screen
           name="Settings"
           options={{
-            drawerIcon: () => <Icon name="settings" size={25} />,
+            drawerIcon: () => <Icon name="settings" size={27} />,
             unmountOnBlur: true,
-            gestureEnabled: false,
+            gestureEnabled: true,
           }}>
           {settingsProps => (
             <SettingScreen
@@ -103,17 +121,33 @@ const CustomNavigator = props => {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
-        <Text style={styles.headerName}>
-          {props.currentUser.name.toUpperCase()}
-        </Text>
-        <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
+        <Image
+          source={require('./Component/stepScreen/src/assets/images/blankProfile.png')}
+          resizeMode="contain"
+          style={styles.image}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.headerName}>
+            {props.currentUser.name.toUpperCase()}
+          </Text>
+          <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
+        </View>
       </View>
       <DrawerItemList {...props} />
       <DrawerItem
+        style={{
+          borderStyle: 'solid',
+          borderColor: 'transparent',
+          borderBottomColor: '#dcdcdc',
+          borderWidth: 1,
+        }}
         label="Log out"
-        // inactiveBackgroundColor="yellow"
-        // activeBackgroundColor="blue"
-        icon={() => <Icon size={25} name="logout" />}
+        labelStyle={{
+          color: '#fd3847',
+          fontSize: 17,
+          paddingLeft: '5%',
+        }}
+        icon={() => <Icon size={27} name="logout" color="#fd3847" />}
         onPress={() => {
           props.signout();
         }}
@@ -131,25 +165,31 @@ const styles = StyleSheet.create({
     marginTop: '-1.45%',
     textAlign: 'center',
     color: 'yellow',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  textContainer: {
+    flexDirection: 'column',
     justifyContent: 'center',
-    // paddingTop: '10%',
-    // paddingBottom: '20%',
+    alignItems: 'flex-start',
+    marginLeft: '4%',
+    maxWidth: 200,
   },
   headerName: {
     color: 'white',
-    fontSize: 32,
-    marginTop: 6,
-    marginBottom: 6,
-    textAlign: 'center',
+    fontSize: 28,
     fontWeight: 'bold',
-    alignSelf: 'center',
   },
   headerEmail: {
     color: 'white',
     fontSize: 15,
-    alignSelf: 'center',
+  },
+  image: {
+    marginLeft: '4%',
+    width: '25%',
+    height: 100,
+    borderRadius: 200,
   },
 });
 
