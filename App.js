@@ -31,8 +31,8 @@ const App: () => React$Node = () => {
         stores.map((_, i, store) => {
           userinfo = {...userinfo, [store[i][0]]: store[i][1]};
         });
-        setIsLoading(false);
         setCurrentUser(userinfo);
+        setIsLoading(false);
       } else {
         console.log('fetch data erorr:', error);
       }

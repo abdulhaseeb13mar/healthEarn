@@ -52,7 +52,9 @@ export default function HomeNavigations(props) {
 const CustomNavigator = props => (
   <DrawerContentScrollView {...props}>
     <View style={styles.header}>
-      <Text style={styles.headerName}>{props.currentUser.name}</Text>
+      <Text style={styles.headerName}>
+        {props.currentUser.name.toUpperCase()}
+      </Text>
       <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
     </View>
     <DrawerItemList {...props} />

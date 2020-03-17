@@ -20,7 +20,6 @@ import GoogleFit from 'react-native-google-fit';
 import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
-import {DoubleBounce} from 'react-native-loader';
 function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -153,7 +152,7 @@ function Untitled(props) {
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
                 {isLoading ? (
-                  <DoubleBounce size={15} color="#0000" />
+                  <Text>0</Text>
                 ) : (
                   <AnimateNumber
                     value={count}
