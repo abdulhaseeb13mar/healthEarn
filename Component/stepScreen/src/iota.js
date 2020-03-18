@@ -1,6 +1,7 @@
 import Mam from '@iota/mam';
 import crypto from 'crypto';
 import {asciiToTrytes} from '@iota/converter';
+import axios from 'axios';
 import iotaConfig from '../../../config';
 
 // Random Key Generator
@@ -40,8 +41,28 @@ export const publishData = async packet => {
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
+    await storeKeysOnFirebase({
+      sidekey: mamKey,
+      root: message.root,
+      time: packet.time,
+    });
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
+  }
+};
+
+const storeKeysOnFirebase = async packet => {
+  const sensorId = 'proBnda';
+  const secretKey = 'AVYVVMISGXVHNXY';
+  try {
+    await axios.post(iotaConfig.firebaseEndPoint, {
+      id: sensorId,
+      packet,
+      sk: secretKey,
+    });
+    console.log('saved in firebase');
+  } catch (e) {
+    console.log(e);
   }
 };
