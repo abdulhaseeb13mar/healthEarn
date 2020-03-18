@@ -22,6 +22,8 @@ import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
 import {DoubleBounce} from 'react-native-loader';
+import {publishData} from '../iota';
+
 function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -134,6 +136,11 @@ function Untitled(props) {
     setCurrentUser(userinfo);
   };
 
+  const publishDataHandler = () => {
+    const time = Date.now();
+    publishData({time, data: {name: 'Ahmed'}});
+  };
+
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={10}
@@ -174,6 +181,10 @@ function Untitled(props) {
                 setIsLoading(true);
                 stepsRetriever();
               }}
+              style={styles.materialButtonViolet}
+            />
+            <MaterialButtonViolet
+              onPress={publishDataHandler}
               style={styles.materialButtonViolet}
             />
             {/* <Icon name="reload" style={styles.icon} /> */}
