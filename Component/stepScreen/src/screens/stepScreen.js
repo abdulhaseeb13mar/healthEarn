@@ -20,6 +20,12 @@ import GoogleFit from 'react-native-google-fit';
 import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
+<<<<<<< HEAD
+=======
+import {DoubleBounce} from 'react-native-loader';
+import {publishData} from '../iota';
+
+>>>>>>> 6ecd5da113a2cab41c4be0892fdd5cf2ea59edd5
 function Untitled(props) {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,6 +142,11 @@ function Untitled(props) {
     setCurrentUser(userinfo);
   };
 
+  const publishDataHandler = () => {
+    const time = Date.now();
+    publishData({time, data: {name: 'Ahmed'}});
+  };
+
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={10}
@@ -177,6 +188,10 @@ function Untitled(props) {
                 stepsRetriever();
               }}
               isDisabled={isDisabledRefreshBtn}
+              style={styles.materialButtonViolet}
+            />
+            <MaterialButtonViolet
+              onPress={publishDataHandler}
               style={styles.materialButtonViolet}
             />
             {/* <Icon name="reload" style={styles.icon} /> */}

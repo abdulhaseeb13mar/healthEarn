@@ -14,6 +14,7 @@ import {
   View,
   AsyncStorage,
   Image,
+  ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HeartRateScreen from './Component/HeartRate';
@@ -120,7 +121,9 @@ const CustomNavigator = props => {
   console.log(props);
   return (
     <DrawerContentScrollView {...props}>
-      <View style={styles.header}>
+      <ImageBackground
+        source={require('./Component/stepScreen/src/assets/images/drawerback.jpg')}
+        style={styles.header}>
         <Image
           source={require('./Component/stepScreen/src/assets/images/blankProfile.png')}
           resizeMode="contain"
@@ -128,11 +131,12 @@ const CustomNavigator = props => {
         />
         <View style={styles.textContainer}>
           <Text style={styles.headerName}>
-            {props.currentUser.name.toUpperCase()}
+            {/* {props.currentUser.name.toUpperCase()} */}
+            Abdul Haseeb
           </Text>
           <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
         </View>
-      </View>
+      </ImageBackground>
       <DrawerItemList {...props} />
       <DrawerItem
         style={{
@@ -168,22 +172,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    marginBottom: 10,
   },
   textContainer: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'flex-start',
     marginLeft: '4%',
-    maxWidth: 200,
+    // maxWidth: 200,
   },
   headerName: {
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
+    backgroundColor: 'black',
   },
   headerEmail: {
     color: 'white',
     fontSize: 15,
+    backgroundColor: 'black',
   },
   image: {
     marginLeft: '4%',
