@@ -7,9 +7,19 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';
-import {Text, Dimensions, StyleSheet, View, AsyncStorage} from 'react-native';
+import {
+  Text,
+  Dimensions,
+  StyleSheet,
+  View,
+  AsyncStorage,
+  Image,
+  ImageBackground,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import HeartRateScreen from './Component/HeartRate';
+import SettingScreen from './Component/Settings';
+import WalletScreen from './Component/Wallet';
 const Drawer = createDrawerNavigator();
 const WIDTH = Dimensions.get('window').width;
 export default function HomeNavigations(props) {
@@ -31,15 +41,75 @@ export default function HomeNavigations(props) {
         drawerContent={drawerComponentProps => (
           <CustomNavigator
             signout={() => clearUserToken()}
+            currentUser={props.currentUser}
             {...drawerComponentProps}
           />
         )}
         drawerContentOptions={{
-          itemStyle: {},
+          activeBackgroundColor: '#bbc5f7',
+          labelStyle: {
+            color: 'black',
+            fontSize: 17,
+            paddingLeft: '5%',
+            paddingBottom: '3%',
+          },
+          itemStyle: {
+            borderStyle: 'solid',
+            borderColor: 'transparent',
+            borderBottomColor: '#dcdcdc',
+            borderWidth: 1,
+          },
         }}>
-        <Drawer.Screen name="Home">
+        <Drawer.Screen
+          name="Home"
+          options={{
+            drawerIcon: () => <Icon name="home" size={27} />,
+            unmountOnBlur: true,
+          }}>
           {homeProps => (
             <StepScreen {...homeProps} userToken={() => props.userToken()} />
+          )}
+        </Drawer.Screen>
+        <Drawer.Screen
+          name="HeartRate"
+          options={{
+            drawerIcon: () => <Icon name="heart" size={27} />,
+            unmountOnBlur: true,
+            gestureEnabled: false,
+          }}>
+          {heartRateProps => (
+            <HeartRateScreen
+              {...heartRateProps}
+              userToken={() => props.userToken()}
+            />
+          )}
+        </Drawer.Screen>
+        <Drawer.Screen
+          name="Wallet"
+          options={{
+            drawerIcon: () => <Icon name="wallet" size={27} />,
+            unmountOnBlur: true,
+            gestureEnabled: false,
+          }}>
+          {walletProps => (
+            <WalletScreen
+              {...walletProps}
+              userToken={() => props.userToken()}
+            />
+          )}
+        </Drawer.Screen>
+        <Drawer.Screen
+          name="Settings"
+          options={{
+            drawerIcon: () => <Icon name="settings" size={27} />,
+            unmountOnBlur: true,
+            gestureEnabled: true,
+          }}>
+          {settingsProps => (
+            <SettingScreen
+              {...settingsProps}
+              userToken={() => props.userToken()}
+            />
           )}
         </Drawer.Screen>
       </Drawer.Navigator>
@@ -47,25 +117,48 @@ export default function HomeNavigations(props) {
   );
 }
 
-const CustomNavigator = props => (
-  <DrawerContentScrollView {...props}>
-    <View style={styles.header}>
-      <Text style={styles.headerName}>ABDUL HASEEB</Text>
-      <Text style={styles.headerEmail}>abdulhaseeb13mar@gmail.com</Text>
-    </View>
-    <DrawerItemList {...props} />
-    <DrawerItem
-      label="Sign out"
-      inactiveBackgroundColor="yellow"
-      activeBackgroundColor="blue"
-      icon={() => <Icon size={25} name="logout" />}
-      onPress={() => {
-        props.signout();
-        //props.navigation.navigate('Home');
-      }}
-    />
-  </DrawerContentScrollView>
-);
+const CustomNavigator = props => {
+  console.log(props);
+  return (
+    <DrawerContentScrollView {...props}>
+      <ImageBackground
+        source={require('./Component/stepScreen/src/assets/images/drawerback.jpg')}
+        style={styles.header}>
+        <Image
+          source={require('./Component/stepScreen/src/assets/images/blankProfile.png')}
+          resizeMode="contain"
+          style={styles.image}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.headerName}>
+            {/* {props.currentUser.name.toUpperCase()} */}
+            Abdul Haseeb
+          </Text>
+          <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
+        </View>
+      </ImageBackground>
+      <DrawerItemList {...props} />
+      <DrawerItem
+        style={{
+          borderStyle: 'solid',
+          borderColor: 'transparent',
+          borderBottomColor: '#dcdcdc',
+          borderWidth: 1,
+        }}
+        label="Log out"
+        labelStyle={{
+          color: '#fd3847',
+          fontSize: 17,
+          paddingLeft: '5%',
+        }}
+        icon={() => <Icon size={27} name="logout" color="#fd3847" />}
+        onPress={() => {
+          props.signout();
+        }}
+      />
+    </DrawerContentScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   header: {
@@ -76,33 +169,128 @@ const styles = StyleSheet.create({
     marginTop: '-1.45%',
     textAlign: 'center',
     color: 'yellow',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+  },
+  textContainer: {
+    flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
-    // paddingTop: '10%',
-    // paddingBottom: '20%',
+    alignItems: 'flex-start',
+    marginLeft: '4%',
+    // maxWidth: 200,
   },
   headerName: {
     color: 'white',
-    fontSize: 32,
-    marginTop: 6,
-    marginBottom: 6,
-    textAlign: 'center',
+    fontSize: 28,
     fontWeight: 'bold',
-    alignSelf: 'center',
+    backgroundColor: 'black',
   },
   headerEmail: {
     color: 'white',
     fontSize: 15,
-    alignSelf: 'center',
+    backgroundColor: 'black',
+  },
+  image: {
+    marginLeft: '4%',
+    width: '25%',
+    height: 100,
+    borderRadius: 200,
   },
 });
 
-// <DrawerItemList {...props} />
-// <DrawerItem
-// label="help"
-// inactiveBackgroundColor="yellow"
-// activeBackgroundColor="blue"
-// icon={() => <Icon size={25} name="help" />}
-// />
-// <Text>Hellp</Text>
+// const h = {
+//   currentUser: {
+//     email: 'abc@abc.com',
+//     name: 'abc',
+//     uid: 'DQ1J3LJkUWUiYWtpGlkQ7k9miJp2',
+//   },
+//   descriptors: {
+//     'Home-PiEUHIkuk': { navigation: [Object], options: [Object], render: [] },
+//   },
+//   itemStyle: {},
+//   navigation: {
+//     addListener: [],
+//     canGoBack: [],
+//     closeDrawer: [],
+//     dangerouslyGetParent: [],
+//     dangerouslyGetState: [],
+//     dispatch: [],
+//     emit: [],
+//     goBack: [],
+//     isFocused: [],
+//     jumpTo: [],
+//     navigate: [],
+//     openDrawer: [],
+//     pop: [],
+//     popToTop: [],
+//     push: [],
+//     removeListener: [],
+//     replace: [],
+//     reset: [],
+//     setOptions: [],
+//     setParams: [],
+//     toggleDrawer: [],
+//   },
+//   progress: {
+//     __children: [[AnimatedCallFunc], [AnimatedOperator]],
+//     __initialized: true,
+//     __inputNodes: [
+//       [AnimatedOperator],
+//       [InternalAnimatedValue],
+//       [AnimatedCallFunc],
+//     ],
+//     __lastLoopID: { '': -1 },
+//     __memoizedValue: { '': null },
+//     __nodeConfig: { cond: 586, elseBlock: 588, ifBlock: 19, type: 'cond' },
+//     __nodeID: 589,
+//     _condition: {
+//       __children: [Array],
+//       __initialized: true,
+//       __inputNodes: [Array],
+//       __lastLoopID: [Object],
+//       __memoizedValue: [Object],
+//       __nodeConfig: [Object],
+//       __nodeID: 586,
+//       _input: [Array],
+//       _op: 'eq',
+//     },
+//     _elseBlock: {
+//       __children: [Array],
+//       __initialized: true,
+//       __inputNodes: [Array],
+//       __lastLoopID: [Object],
+//       __memoizedValue: [Object],
+//       __nodeConfig: [Object],
+//       __nodeID: 588,
+//       _args: [Array],
+//       _params: [Array],
+//       _what: [AnimatedFunction],
+//     },
+//     _ifBlock: {
+//       __children: [Array],
+//       __initialized: true,
+//       __inputNodes: undefined,
+//       __lastLoopID: [Object],
+//       __memoizedValue: [Object],
+//       __nodeConfig: [Object],
+//       __nodeID: 19,
+//       _animation: null,
+//       _constant: true,
+//       _startingValue: 0,
+//       _value: 0,
+//     },
+//   },
+//   signout: [],
+//   state: {
+//     history: [[Object]],
+//     index: 0,
+//     key: 'drawer-y4lut5Vs1',
+//     routeNames: ['Home'],
+//     routes: [[Object]],
+//     stale: false,
+//     type: 'drawer',
+//   },
+// };

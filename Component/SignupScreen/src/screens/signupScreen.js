@@ -26,12 +26,11 @@ function Untitled1(props) {
     if (isFormValid()) {
       firebase
         .auth()
-        .createUserWithEmailAndPassword(email, password)
+        .createUserWithEmailAndPassword(email.trim(), password)
         .then(createdUser => {
           createdUser.user.updateProfile({
             displayName: username,
           });
-          setLoading(false);
           setemailErrMsg('');
           setPasswordErrMsg('');
           setUsernameErrMsg('');
@@ -74,11 +73,6 @@ function Untitled1(props) {
     } else {
       return false;
     }
-  };
-  const clearUserToken = () => {
-    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
-      console.log('clearData error:', error),
-    );
   };
 
   return (
