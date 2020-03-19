@@ -7,14 +7,13 @@ import {
   Text,
   ScrollView,
   AsyncStorage,
-  Button,
   KeyboardAvoidingView,
 } from 'react-native';
+import firebase from '../../../../firebase';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-import firebase from '../../../../firebase';
 
-function Untitled1(props) {
+const Untitled1 = props => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameErrMsg, setUsernameErrMsg] = useState('');
@@ -26,7 +25,6 @@ function Untitled1(props) {
       .auth()
       .signInWithEmailAndPassword(username.trim(), password)
       .then(signedInUser => {
-        console.log(signedInUser);
         setUsernameErrMsg('');
         setPasswordErrMsg('');
         AsyncStorage.multiSet(
@@ -41,7 +39,6 @@ function Untitled1(props) {
       })
       .catch(err => {
         setLoading(false);
-        console.log(err.message);
         if (err.message.includes('email')) {
           setUsernameErrMsg(err.message);
           setPasswordErrMsg('');
@@ -53,22 +50,6 @@ function Untitled1(props) {
           setPasswordErrMsg('');
         }
       });
-  };
-
-  const clearData = () => {
-    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
-      console.log('clearData error:', error),
-    );
-  };
-
-  const fetchdata = () => {
-    AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
-      console.log('fetch data erorr:', error);
-      stores.map((result, i, store) => {
-        // get at each store's key/value so you can work with it
-        console.log(store[i][0], store[i][1]);
-      });
-    });
   };
   return (
     <KeyboardAvoidingView behavior="height">
@@ -102,12 +83,6 @@ function Untitled1(props) {
             }}
             value={password}
           />
-          {/* <Text style={styles.error}>Error</Text> */}
-          {/* <MaterialMessageTextbox
-          text1="Seed"
-          textInput1="Enter your Seed Address"
-          style={styles.signupSeed}
-        /> */}
           <MaterialButtonViolet
             onPress={() => {
               setLoading(true);
@@ -118,7 +93,7 @@ function Untitled1(props) {
             isLoading={loading}
           />
           <Text style={styles.alreadyText}>
-            Don't have an account?{' '}
+            Don't have an account?
             <Text
               onPress={() => {
                 props.navigation.navigate('Signup');
@@ -131,7 +106,7 @@ function Untitled1(props) {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

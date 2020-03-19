@@ -7,13 +7,12 @@ import {
   Text,
   ScrollView,
   AsyncStorage,
-  Button,
 } from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import firebase from '../../../../firebase';
 
-function Untitled1(props) {
+const Untitled1 = props => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -34,7 +33,6 @@ function Untitled1(props) {
           setemailErrMsg('');
           setPasswordErrMsg('');
           setUsernameErrMsg('');
-          console.log(createdUser);
           AsyncStorage.multiSet(
             [
               ['name', username],
@@ -49,7 +47,6 @@ function Untitled1(props) {
         })
         .catch(err => {
           setLoading(false);
-          console.log(err.message);
           if (err.message.includes('email')) {
             setemailErrMsg(err.message);
             setPasswordErrMsg('');
@@ -61,8 +58,6 @@ function Untitled1(props) {
           }
         });
     } else {
-      console.log('hello');
-
       setLoading(false);
       setUsernameErrMsg('Please Enter Your Name');
     }
@@ -139,7 +134,7 @@ function Untitled1(props) {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

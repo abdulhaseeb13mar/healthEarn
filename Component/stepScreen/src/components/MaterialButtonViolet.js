@@ -14,7 +14,7 @@ function MaterialButtonViolet(props) {
           backgroundColor: props.isDisabled ? '#a4afeb' : '#3F51B5',
         },
       ]}>
-      <Text style={styles.caption}>Refresh</Text>
+      <Text style={styles.caption}>{props.text}</Text>
     </TouchableOpacity>
   );
 }

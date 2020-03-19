@@ -6,7 +6,6 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 import {
   Text,
   Dimensions,
@@ -20,9 +19,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HeartRateScreen from './Component/HeartRate';
 import SettingScreen from './Component/Settings';
 import WalletScreen from './Component/Wallet';
+import StepScreen from './Component/stepScreen/src/screens/stepScreen';
+
 const Drawer = createDrawerNavigator();
 const WIDTH = Dimensions.get('window').width;
-export default function HomeNavigations(props) {
+const HomeNavigations = props => {
   const clearUserToken = async () => {
     await AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
       error === null ? null : console.log('clearData error:', error),
@@ -67,7 +68,11 @@ export default function HomeNavigations(props) {
             unmountOnBlur: true,
           }}>
           {homeProps => (
-            <StepScreen {...homeProps} userToken={() => props.userToken()} />
+            <StepScreen
+              {...homeProps}
+              currentUser={props.currentUser}
+              userToken={() => props.userToken()}
+            />
           )}
         </Drawer.Screen>
         <Drawer.Screen
@@ -115,10 +120,9 @@ export default function HomeNavigations(props) {
       </Drawer.Navigator>
     </>
   );
-}
+};
 
 const CustomNavigator = props => {
-  console.log(props);
   return (
     <DrawerContentScrollView {...props}>
       <ImageBackground
@@ -180,7 +184,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
     marginLeft: '4%',
-    // maxWidth: 200,
   },
   headerName: {
     color: 'white',
@@ -200,6 +203,8 @@ const styles = StyleSheet.create({
     borderRadius: 200,
   },
 });
+
+export default React.memo(HomeNavigations);
 
 // const h = {
 //   currentUser: {
