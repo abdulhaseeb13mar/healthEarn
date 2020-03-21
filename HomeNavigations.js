@@ -16,9 +16,9 @@ import {
   ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HeartRateScreen from './Component/HeartRate';
-import SettingScreen from './Component/Settings';
-import WalletScreen from './Component/Wallet';
+import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
+import SettingScreen from './Component/SettingsScreen/Settings';
+import WalletScreen from './Component/WalletScreen/Wallet';
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 
 const Drawer = createDrawerNavigator();
@@ -135,8 +135,7 @@ const CustomNavigator = props => {
         />
         <View style={styles.textContainer}>
           <Text style={styles.headerName}>
-            {/* {props.currentUser.name.toUpperCase()} */}
-            Abdul Haseeb
+            {props.currentUser.name.toUpperCase()}
           </Text>
           <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
         </View>

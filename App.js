@@ -5,7 +5,17 @@
  * @format
  * @flow
  */
+
 import 'react-native-gesture-handler';
+import {decode, encode} from 'base-64';
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
 import React, {useState, useEffect} from 'react';
 import {AsyncStorage} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -13,7 +23,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Login from './Component/LoginScreen/src/screens/loginScreen';
 import Signup from './Component/SignupScreen/src/screens/signupScreen';
 import HomeScreen from './HomeNavigations';
-import SplashScreen from './Component/splashScreen';
+import SplashScreen from './Component/SplashScreen/splashScreen';
 
 const Stack = createStackNavigator();
 const App: () => React$Node = () => {

@@ -11,6 +11,7 @@ import {
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import firebase from '../../../../firebase';
+import {checkUsername} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -21,8 +22,8 @@ const Untitled1 = props => {
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const signUp = () => {
-    if (isFormValid()) {
+  const signUp = async () => {
+    if (await isFormValid()) {
       firebase
         .auth()
         .createUserWithEmailAndPassword(email.trim(), password)
@@ -59,13 +60,19 @@ const Untitled1 = props => {
         });
     } else {
       setLoading(false);
-      setUsernameErrMsg('Please Enter Your Name');
     }
   };
-  const isFormValid = () => {
+  const isFormValid = async () => {
     if (username !== '') {
-      return true;
+      const isUsernameValid = await checkUsername(username);
+      if (isUsernameValid) {
+        setUsernameErrMsg('This Username Already Exists');
+        return false;
+      } else {
+        return true;
+      }
     } else {
+      setUsernameErrMsg('Please Enter Your Name');
       return false;
     }
   };
