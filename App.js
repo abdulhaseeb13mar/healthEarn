@@ -7,15 +7,7 @@
  */
 
 import 'react-native-gesture-handler';
-import {decode, encode} from 'base-64';
 
-if (!global.btoa) {
-  global.btoa = encode;
-}
-
-if (!global.atob) {
-  global.atob = decode;
-}
 import React, {useState, useEffect} from 'react';
 import {AsyncStorage} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';

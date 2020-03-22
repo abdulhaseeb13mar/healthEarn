@@ -134,9 +134,7 @@ const CustomNavigator = props => {
           style={styles.image}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.headerName}>
-            {props.currentUser.name.toUpperCase()}
-          </Text>
+          <Text style={styles.headerName}>{props.currentUser.name}</Text>
           <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
         </View>
       </ImageBackground>

@@ -47,12 +47,20 @@ const Untitled1 = props => {
           props.userToken();
         })
         .catch(err => {
+          console.log(err);
           setLoading(false);
           if (err.message.includes('email')) {
-            setemailErrMsg(err.message);
+            if (err.message.includes('formatted')) {
+              setemailErrMsg(err.message);
+            } else if (err.message.includes('already')) {
+              setemailErrMsg('Email already in use');
+            }
             setPasswordErrMsg('');
             setUsernameErrMsg('');
-          } else if (err.message.includes('Password')) {
+          } else if (
+            err.message.includes('Password') ||
+            err.message.includes('password')
+          ) {
             setPasswordErrMsg(err.message);
             setUsernameErrMsg('');
             setemailErrMsg('');
@@ -67,6 +75,8 @@ const Untitled1 = props => {
       const isUsernameValid = await checkUsername(username);
       if (isUsernameValid) {
         setUsernameErrMsg('This Username Already Exists');
+        setPasswordErrMsg('');
+        setemailErrMsg('');
         return false;
       } else {
         return true;
