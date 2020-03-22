@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-import firebase from '../../../../firebase';
-import {checkUsername} from '../../../Firebase';
+// import firebase from '../../../../firebase';
+import {checkUsername, register} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -24,48 +24,42 @@ const Untitled1 = props => {
 
   const signUp = async () => {
     if (await isFormValid()) {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email.trim(), password)
-        .then(createdUser => {
-          createdUser.user.updateProfile({
-            displayName: username,
-          });
-          setemailErrMsg('');
+      const response = await register(username, email.trim(), password);
+      if (response.status) {
+        setemailErrMsg('');
+        setPasswordErrMsg('');
+        setUsernameErrMsg('');
+        await AsyncStorage.multiSet(
+          // eslint-disable-next-line prettier/prettier
+          [
+            ['name', username],
+            ['email', email],
+            ['uid', response.user.uid],
+          ],
+          error => {
+            error ? console.log('setData error:', error) : null;
+          },
+        );
+        props.userToken();
+      } else {
+        setLoading(false);
+        if (response.message.includes('email')) {
+          if (response.message.includes('formatted')) {
+            setemailErrMsg(response.message);
+          } else if (response.message.includes('already')) {
+            setemailErrMsg('Email already in use');
+          }
           setPasswordErrMsg('');
           setUsernameErrMsg('');
-          AsyncStorage.multiSet(
-            [
-              ['name', username],
-              ['email', email],
-              ['uid', createdUser.user.uid],
-            ],
-            error => {
-              console.log('setData error:', error);
-            },
-          );
-          props.userToken();
-        })
-        .catch(err => {
-          console.log(err);
-          setLoading(false);
-          if (err.message.includes('email')) {
-            if (err.message.includes('formatted')) {
-              setemailErrMsg(err.message);
-            } else if (err.message.includes('already')) {
-              setemailErrMsg('Email already in use');
-            }
-            setPasswordErrMsg('');
-            setUsernameErrMsg('');
-          } else if (
-            err.message.includes('Password') ||
-            err.message.includes('password')
-          ) {
-            setPasswordErrMsg(err.message);
-            setUsernameErrMsg('');
-            setemailErrMsg('');
-          }
-        });
+        } else if (
+          response.message.includes('Password') ||
+          response.message.includes('password')
+        ) {
+          setPasswordErrMsg(response.message);
+          setUsernameErrMsg('');
+          setemailErrMsg('');
+        }
+      }
     } else {
       setLoading(false);
     }

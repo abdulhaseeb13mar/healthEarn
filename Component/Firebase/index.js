@@ -41,21 +41,35 @@ export const checkUsername = async name => {
 //   // Call server
 //   await api.post('newDevice', packet);
 // };
+export const register = async (name, email, password) => {
+  let userStatus;
+  await firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then(createdUser => {
+      createdUser.user.updateProfile({
+        displayName: name,
+      });
+      userStatus = {status: true, ...createdUser};
+    })
+    .catch(err => {
+      userStatus = {status: false, message: err.message};
+    });
+  return userStatus;
+};
 
-// export const register = async (name, email, password, seed) => {
+// export const register = async (name, email, password) => {
 //   let user;
 //   try {
 //     user = await firebase
 //       .auth()
 //       .createUserWithEmailAndPassword(email, password);
-//     persistLoginInfo(true);
+//     // persistLoginInfo(true);
 //     await user.user.updateProfile({
 //       displayName: name,
-//       photoURL: seed,
 //     });
-
 //     await createUserHealthProfile({...user.user, name});
-//     await firebase.auth().currentUser.sendEmailVerification();
+//     // await firebase.auth().currentUser.sendEmailVerification();
 //   } catch ({code, message}) {
 //     console.log('exception -> ', {code, message});
 //     return {status: false, message, code};
