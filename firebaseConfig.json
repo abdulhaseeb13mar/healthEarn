@@ -6,5 +6,6 @@
   "storageBucket": "iota-data-marketplace-b074f.appspot.com",
   "messagingSenderId": "112257821766",
   "appId": "1: 112257821766:web: 8fdc78b242ef30b7ca6e47",
-  "measurementId": "G-94VJJGCX7T"
+  "measurementId": "G-94VJJGCX7T",
+  "domain": "https://us-central1-iota-data-marketplace-b074f.cloudfunctions.net"
 }

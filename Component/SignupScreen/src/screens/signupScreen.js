@@ -12,6 +12,7 @@ import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 // import firebase from '../../../../firebase';
 import {checkUsername, register} from '../../../Firebase';
+import {createUserHealthProfile} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -21,6 +22,29 @@ const Untitled1 = props => {
   const [usernameErrMsg, setUsernameErrMsg] = useState(false);
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  // const h = {
+  //   additionalUserInfo: {isNewUser: true, providerId: 'password'},
+  //   credential: null,
+  //   operationType: 'signIn',
+  //   user: {
+  //     apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
+  //     appName: '[DEFAULT]',
+  //     authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
+  //     createdAt: '1584982393868',
+  //     displayName: null,
+  //     email: 'abdulhaseeb13mar@gmail.com',
+  //     emailVerified: false,
+  //     isAnonymous: false,
+  //     lastLoginAt: '1584982393868',
+  //     phoneNumber: null,
+  //     photoURL: null,
+  //     providerData: [Array],
+  //     redirectEventId: null,
+  //     stsTokenManager: [Object],
+  //     tenantId: null,
+  //     uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
+  //   },
+  // };
 
   const signUp = async () => {
     if (await isFormValid()) {
@@ -40,6 +64,10 @@ const Untitled1 = props => {
             error ? console.log('setData error:', error) : null;
           },
         );
+        await createUserHealthProfile({
+          uid: response.user.uid,
+          name: username,
+        });
         props.userToken();
       } else {
         setLoading(false);

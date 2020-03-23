@@ -23,8 +23,8 @@ const parseEndpoint = (endpoint, params) => {
 };
 
 const request = async (endpoint, {params, ...settings} = {}) => {
-  console.log('EndPoint => ', endpoint);
-  console.log('Params => ', params);
+  // console.log('EndPoint => ', endpoint);
+  // console.log('Params => ', params);
   // console.log("Settings => ", settings);
   // console.log("parse endpoint =>", parseEndpoint(endpoint, params));
   // console.log("Pasrse Settings => ", parseSettings(settings));
@@ -35,7 +35,7 @@ const request = async (endpoint, {params, ...settings} = {}) => {
   );
   // console.log("ParseSettings -> ", parseSettings(settings));
   const result = await response.json();
-  console.log('Result of complete request ==> ', result);
+  // console.log('Result of complete request ==> ', result);
   return result;
 };
 

@@ -1,46 +1,9 @@
 import firebase from 'firebase/app';
 import 'firebase/app';
 import 'firebase/auth';
+import api from '../../utils/api';
+import moment from 'moment';
 
-export const checkUsername = async name => {
-  try {
-    const docRef = firebase
-      .firestore()
-      .collection('devices')
-      .doc(name);
-    const doc = await docRef.get();
-    return doc.exists;
-  } catch (e) {
-    console.log('error occured while checking username');
-  }
-};
-
-// const createUserHealthProfile = async user => {
-//   const apiKey = (await api.get('user', {userId: user.uid})).apiKey;
-
-//   // Assign to user
-//   const profile = {
-//     sensorId: user.name,
-//     type: 'health',
-//     healthData: true,
-//     dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
-//     price: 100,
-//     date: format(Date.now(), 'DD MMMM, YYYY H:mm a '),
-//   };
-
-//   profile.owner = user.uid;
-//   // Deactivate the Device
-//   profile.inactive = true;
-
-//   const packet = {
-//     apiKey,
-//     id: profile.sensorId,
-//     device: profile,
-//   };
-
-//   // Call server
-//   await api.post('newDevice', packet);
-// };
 export const register = async (name, email, password) => {
   let userStatus;
   await firebase
@@ -56,6 +19,46 @@ export const register = async (name, email, password) => {
       userStatus = {status: false, message: err.message};
     });
   return userStatus;
+};
+
+export const checkUsername = async name => {
+  try {
+    const docRef = firebase
+      .firestore()
+      .collection('devices')
+      .doc(name);
+    const doc = await docRef.get();
+    return doc.exists;
+  } catch (e) {
+    console.log('error occured while checking username', e);
+  }
+};
+
+export const createUserHealthProfile = async user => {
+  const apiKey = (await api.get('user', {userId: user.uid})).apiKey;
+
+  // Assign to user
+  const profile = {
+    sensorId: user.name,
+    type: 'health',
+    healthData: true,
+    dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
+    price: 100,
+    date: moment().format('DD MMMM, YYYY H:mm a'),
+  };
+
+  profile.owner = user.uid;
+  // Deactivate the Device
+  profile.inactive = true;
+
+  const packet = {
+    apiKey,
+    id: profile.sensorId,
+    device: profile,
+  };
+
+  // Call server
+  await api.post('newDevice', packet);
 };
 
 // export const register = async (name, email, password) => {

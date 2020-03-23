@@ -170,7 +170,12 @@ const Untitled = props => {
             />
             <MaterialButtonViolet
               text="Send Data"
-              onPress={publishDataHandler}
+              onPress={() =>
+                createUserHealthProfile({
+                  uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
+                  name: 'AbdulHaseeb',
+                })
+              }
               style={styles.materialButtonViolet}
             />
           </View>
@@ -187,11 +192,7 @@ const Untitled = props => {
             <Text style={styles.popupText}>
               You have not allowed Location Permission!{' '}
             </Text>
-            <Button
-              title="ALLOW"
-              color="#3F51B5"
-              onPress={() => requestLocationPermission()}
-            />
+            <Button title="ALLOW" color="#3F51B5" />
           </View>
         )}
       </SafeAreaView>
