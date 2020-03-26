@@ -1,43 +1,43 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-unused-vars */
-import React, {Component, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
   Text,
   PermissionsAndroid,
   SafeAreaView,
-  Alert,
   KeyboardAvoidingView,
-  Button,
   AsyncStorage,
+  Dimensions,
+  Button,
+  Alert,
 } from 'react-native';
-import {Header, Left} from 'native-base';
-import MaterialButtonTransparentHamburger from '../components/MaterialButtonTransparentHamburger';
-import MaterialButtonViolet from '../components/MaterialButtonViolet';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import GoogleFit from 'react-native-google-fit';
-import localScopes from '../../../../scopes';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
-import {DoubleBounce} from 'react-native-loader';
-function Untitled(props) {
+import MaterialButtonViolet from '../components/MaterialButtonViolet';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import localScopes from '../../../../scopes';
+import {publishData} from '../iota';
+
+const HEIGHT = Dimensions.get('window').height;
+
+const Untitled = props => {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState({});
+  const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
+  const [locationAllowed, setLocationAllowed] = useState(true);
+
   useEffect(() => {
-    console.log('component mounted');
     setIsLoading(true);
     locationAuthorize();
-    fetchUserToken();
     return () => {
       GoogleFit.unsubscribeListeners();
-      console.log('will unmount');
     };
   }, []);
 
-  async function locationAuthorize() {
+  const locationAuthorize = async () => {
     const options = {
       scopes: [
         localScopes.FITNESS_ACTIVITY_READ_WRITE,
@@ -53,39 +53,40 @@ function Untitled(props) {
               console.log(x);
             });
           }
+        } else {
+          return Alert.alert(
+            'Alert!',
+            'Please Select your account for Google Fit',
+            [{text: 'OK', onPress: () => locationAuthorize()}],
+            {cancelable: false},
+          );
         }
       })
       .catch(e => {
         console.log(e);
-        Alert.alert('error');
       });
     stepsRetriever();
-  }
+  };
 
-  async function requestLocationPermission() {
+  const requestLocationPermission = async () => {
     try {
       const fineGranted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'fine Location Permission',
-          message: 'Allow Health Earn to Access your Location',
-          //buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
       );
       if (fineGranted === PermissionsAndroid.RESULTS.GRANTED) {
         console.log('You can use the fine location');
+        setLocationAllowed(true);
         return true;
       } else {
         console.log('Location permission denied');
+        setLocationAllowed(false);
         return false;
       }
     } catch (err) {
       console.log(err);
       return false;
     }
-  }
+  };
 
   //--------------------retrieve steps----------------------------
   const stepsRetriever = () => {
@@ -99,19 +100,19 @@ function Untitled(props) {
       startDate: new Date(
         moment().format('YYYY-MM-DD' + 'T' + '00:00:00' + 'Z'),
       ).toISOString(),
-      endDate: new Date().toISOString(), // required ISO8601Timestamp
+      endDate: new Date().toISOString(),
     };
 
     GoogleFit.getDailyStepCountSamples(retrieveOptions)
       .then(res => {
-        console.log(res);
-        //console.log(res[2].steps);
         for (let i = 0; i < res.length; i++) {
           if (res[i].source === 'com.google.android.gms:estimated_steps') {
             res[i].steps.length !== 0
               ? setCount(res[i].steps[0].value)
               : setCount(0);
-            console.log(res[i].steps[0].value);
+            setTimeout(() => {
+              setIsDisabledRefreshBtn(false);
+            }, 3500);
             setIsLoading(false);
             break;
           }
@@ -122,16 +123,9 @@ function Untitled(props) {
       });
   };
 
-  const fetchUserToken = async () => {
-    let userinfo = {};
-    await AsyncStorage.multiGet(['name', 'email', 'uid'], (error, stores) => {
-      console.log('fetch data erorr:', error);
-      stores.map((_, i, store) => {
-        userinfo = {...userinfo, [store[i][0]]: store[i][1]};
-        console.log(userinfo);
-      });
-    });
-    setCurrentUser(userinfo);
+  const publishDataHandler = () => {
+    const time = Date.now();
+    publishData({time, data: {name: 'Ahmed'}});
   };
 
   return (
@@ -141,23 +135,18 @@ function Untitled(props) {
       style={{flex: 1}}>
       <SafeAreaView>
         <View style={styles.container}>
-          {/* <MaterialButtonTransparentHamburger
-            style={styles.materialButtonTransparentHamburger}
-          /> */}
           <View style={styles.innerContainer}>
-            <Text style={styles.UpperLine}>Hello {currentUser.name}</Text>
+            <Text style={styles.UpperLine}>Hello {props.currentUser.name}</Text>
             <Text style={styles.UpperLine}>Today you have walked:</Text>
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
                 {isLoading ? (
-                  <DoubleBounce size={15} color="#0000" />
+                  <Text>0</Text>
                 ) : (
                   <AnimateNumber
-                    initial={1}
                     value={count}
                     interval={14}
                     timing={(interval, progress) => {
-                      // slow start, slow end
                       return interval * (1 - Math.sin(Math.PI * progress)) * 10;
                     }}
                     formatter={val => {
@@ -170,13 +159,25 @@ function Untitled(props) {
               <Text style={styles.stepsToday}>Steps</Text>
             </Text>
             <MaterialButtonViolet
+              text="Refresh"
               onPress={() => {
                 setIsLoading(true);
+                setIsDisabledRefreshBtn(true);
                 stepsRetriever();
               }}
+              isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            {/* <Icon name="reload" style={styles.icon} /> */}
+            <MaterialButtonViolet
+              text="Send Data"
+              onPress={() =>
+                createUserHealthProfile({
+                  uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
+                  name: 'AbdulHaseeb',
+                })
+              }
+              style={styles.materialButtonViolet}
+            />
           </View>
         </View>
         <View>
@@ -185,27 +186,27 @@ function Untitled(props) {
             size={40}
             onPress={() => props.navigation.openDrawer()}
           />
-          {/* <Icon
-            onPress={() => console.log(currentUser)}
-            name="logout"
-            size={40}
-          /> */}
         </View>
+        {locationAllowed ? null : (
+          <View style={styles.popup}>
+            <Text style={styles.popupText}>
+              You have not allowed Location Permission!{' '}
+            </Text>
+            <Button title="ALLOW" color="#3F51B5" />
+          </View>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'space-between',
   },
   innerContainer: {
     marginTop: 50,
-  },
-  materialButtonTransparentHamburger: {
-    width: 46,
-    height: 44,
   },
   stepsLine: {
     justifyContent: 'space-between',
@@ -244,23 +245,23 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignSelf: 'center',
   },
-  icon: {
-    color: 'rgba(128,128,128,1)',
-    fontSize: 40,
-    marginTop: -256,
-    marginLeft: 285,
+  popup: {
+    position: 'absolute',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: 60,
+    backgroundColor: 'black',
+    color: 'white',
+    bottom: 0,
+    top: HEIGHT - 60,
+    opacity: 0.8,
   },
-  materialMessageTextbox: {
-    width: 307,
-    height: 120,
-    shadowOffset: {
-      width: 5,
-      height: 5,
-    },
-    shadowColor: 'rgba(0,0,0,1)',
-    shadowOpacity: 0.01,
-    marginTop: 207,
-    alignSelf: 'center',
+  popupText: {
+    color: 'white',
+    fontSize: 14,
   },
 });
 

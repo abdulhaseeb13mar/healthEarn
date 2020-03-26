@@ -7,13 +7,14 @@ import {
   Text,
   ScrollView,
   AsyncStorage,
-  Button,
 } from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-import firebase from '../../../../firebase';
+// import firebase from '../../../../firebase';
+import {checkUsername, register} from '../../../Firebase';
+import {createUserHealthProfile} from '../../../Firebase';
 
-function Untitled1(props) {
+const Untitled1 = props => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -21,64 +22,91 @@ function Untitled1(props) {
   const [usernameErrMsg, setUsernameErrMsg] = useState(false);
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  // const h = {
+  //   additionalUserInfo: {isNewUser: true, providerId: 'password'},
+  //   credential: null,
+  //   operationType: 'signIn',
+  //   user: {
+  //     apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
+  //     appName: '[DEFAULT]',
+  //     authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
+  //     createdAt: '1584982393868',
+  //     displayName: null,
+  //     email: 'abdulhaseeb13mar@gmail.com',
+  //     emailVerified: false,
+  //     isAnonymous: false,
+  //     lastLoginAt: '1584982393868',
+  //     phoneNumber: null,
+  //     photoURL: null,
+  //     providerData: [Array],
+  //     redirectEventId: null,
+  //     stsTokenManager: [Object],
+  //     tenantId: null,
+  //     uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
+  //   },
+  // };
 
-  const signUp = () => {
-    if (isFormValid()) {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(createdUser => {
-          createdUser.user.updateProfile({
-            displayName: username,
-          });
-          setLoading(false);
-          setemailErrMsg('');
+  const signUp = async () => {
+    if (await isFormValid()) {
+      const response = await register(username, email.trim(), password);
+      if (response.status) {
+        setemailErrMsg('');
+        setPasswordErrMsg('');
+        setUsernameErrMsg('');
+        await AsyncStorage.multiSet(
+          // eslint-disable-next-line prettier/prettier
+          [
+            ['name', username],
+            ['email', email],
+            ['uid', response.user.uid],
+          ],
+          error => {
+            error ? console.log('setData error:', error) : null;
+          },
+        );
+        await createUserHealthProfile({
+          uid: response.user.uid,
+          name: username,
+        });
+        props.userToken();
+      } else {
+        setLoading(false);
+        if (response.message.includes('email')) {
+          if (response.message.includes('formatted')) {
+            setemailErrMsg(response.message);
+          } else if (response.message.includes('already')) {
+            setemailErrMsg('Email already in use');
+          }
           setPasswordErrMsg('');
           setUsernameErrMsg('');
-          console.log(createdUser);
-          AsyncStorage.multiSet(
-            [
-              ['name', username],
-              ['email', email],
-              ['uid', createdUser.user.uid],
-            ],
-            error => {
-              console.log('setData error:', error);
-            },
-          );
-          props.userToken();
-        })
-        .catch(err => {
-          setLoading(false);
-          console.log(err.message);
-          if (err.message.includes('email')) {
-            setemailErrMsg(err.message);
-            setPasswordErrMsg('');
-            setUsernameErrMsg('');
-          } else if (err.message.includes('Password')) {
-            setPasswordErrMsg(err.message);
-            setUsernameErrMsg('');
-            setemailErrMsg('');
-          }
-        });
+        } else if (
+          response.message.includes('Password') ||
+          response.message.includes('password')
+        ) {
+          setPasswordErrMsg(response.message);
+          setUsernameErrMsg('');
+          setemailErrMsg('');
+        }
+      }
     } else {
-      console.log('hello');
-
       setLoading(false);
-      setUsernameErrMsg('Please Enter Your Name');
     }
   };
-  const isFormValid = () => {
+  const isFormValid = async () => {
     if (username !== '') {
-      return true;
+      const isUsernameValid = await checkUsername(username);
+      if (isUsernameValid) {
+        setUsernameErrMsg('This Username Already Exists');
+        setPasswordErrMsg('');
+        setemailErrMsg('');
+        return false;
+      } else {
+        return true;
+      }
     } else {
+      setUsernameErrMsg('Please Enter Your Name');
       return false;
     }
-  };
-  const clearUserToken = () => {
-    AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
-      console.log('clearData error:', error),
-    );
   };
 
   return (
@@ -145,7 +173,7 @@ function Untitled1(props) {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
