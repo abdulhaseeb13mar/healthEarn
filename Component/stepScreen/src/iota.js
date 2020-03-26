@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import {asciiToTrytes} from '@iota/converter';
 import axios from 'axios';
 import iotaConfig from '../../../config';
+import api from '../../../utils/api';
 
 // Random Key Generator
 const generateRandomKey = length => {
@@ -15,8 +16,14 @@ const generateRandomKey = length => {
   // ).join('');
 };
 
-export const publishData = async packet => {
+export const publishData = async (userId, username, packet) => {
   try {
+    const res = await api.get('getSk', {userId, username});
+    if (!res) {
+      return;
+    }
+    const {sk} = res;
+
     // Initialise MAM State
     let mamState = Mam.init(iotaConfig.provider);
 
@@ -41,7 +48,7 @@ export const publishData = async packet => {
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
-    await storeKeysOnFirebase({
+    await storeKeysOnFirebase(sk, username, {
       sidekey: mamKey,
       root: message.root,
       time: packet.time,
@@ -52,14 +59,13 @@ export const publishData = async packet => {
   }
 };
 
-const storeKeysOnFirebase = async packet => {
-  const sensorId = 'proBnda';
-  const secretKey = 'AVYVVMISGXVHNXY';
+const storeKeysOnFirebase = async (sk, username, packet) => {
+  const sensorId = username;
   try {
     await axios.post(iotaConfig.firebaseEndPoint, {
       id: sensorId,
       packet,
-      sk: secretKey,
+      sk,
     });
     console.log('saved in firebase');
   } catch (e) {

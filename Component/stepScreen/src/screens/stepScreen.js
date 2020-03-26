@@ -125,7 +125,8 @@ const Untitled = props => {
 
   const publishDataHandler = () => {
     const time = Date.now();
-    publishData({time, data: {name: 'Ahmed'}});
+    const {name, uid} = props.currentUser;
+    publishData(uid, name, {time, data: {name: 'Ahmed'}});
   };
 
   return (
@@ -170,12 +171,7 @@ const Untitled = props => {
             />
             <MaterialButtonViolet
               text="Send Data"
-              onPress={() =>
-                createUserHealthProfile({
-                  uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
-                  name: 'AbdulHaseeb',
-                })
-              }
+              onPress={publishDataHandler}
               style={styles.materialButtonViolet}
             />
           </View>
