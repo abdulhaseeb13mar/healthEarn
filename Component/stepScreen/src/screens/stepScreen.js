@@ -28,6 +28,7 @@ const Untitled = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -124,9 +125,17 @@ const Untitled = props => {
   };
 
   const publishDataHandler = () => {
+    setIsPublishing(true);
     const time = Date.now();
     const {name, uid} = props.currentUser;
-    publishData(uid, name, {time, data: {name: 'Ahmed'}});
+
+    // More fields in future would be added here after its structure being pushed
+    // in devices -> sesnorId -> dataTypes
+    const packet = {
+      'No of Steps': count,
+    };
+
+    publishData(uid, name, {time, data: packet}, setIsPublishing);
   };
 
   return (
@@ -173,6 +182,7 @@ const Untitled = props => {
               text="Send Data"
               onPress={publishDataHandler}
               style={styles.materialButtonViolet}
+              isDisabled={isPublishing}
             />
           </View>
         </View>

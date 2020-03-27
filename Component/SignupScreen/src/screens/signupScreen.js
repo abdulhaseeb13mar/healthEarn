@@ -126,7 +126,7 @@ const Untitled1 = props => {
         />
         <MaterialMessageTextbox
           text1="Username"
-          textInput1="Enter your Name"
+          textInput1="Enter your Username"
           style={styles.signupUsername}
           error={usernameErrMsg ? true : false}
           errorMessage={usernameErrMsg ? usernameErrMsg : null}

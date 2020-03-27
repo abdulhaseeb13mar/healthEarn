@@ -7,16 +7,16 @@ import api from '../../../utils/api';
 
 // Random Key Generator
 const generateRandomKey = length => {
-  return 'ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9';
-  // const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ9';
-  // const values = crypto.randomBytes(length);
-  // return Array.from(
-  //   new Array(length),
-  //   (x, i) => charset[values[i] % charset.length],
-  // ).join('');
+  // return 'ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9ABCDABCD9';
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ9';
+  const values = crypto.randomBytes(length);
+  return Array.from(
+    new Array(length),
+    (x, i) => charset[values[i] % charset.length],
+  ).join('');
 };
 
-export const publishData = async (userId, username, packet) => {
+export const publishData = async (userId, username, packet, loadingHandler) => {
   try {
     const res = await api.get('getSk', {userId, username});
     if (!res) {
@@ -56,6 +56,8 @@ export const publishData = async (userId, username, packet) => {
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
+  } finally {
+    loadingHandler(false);
   }
 };
 
