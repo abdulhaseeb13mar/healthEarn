@@ -28,6 +28,7 @@ const Untitled = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -124,8 +125,17 @@ const Untitled = props => {
   };
 
   const publishDataHandler = () => {
+    setIsPublishing(true);
     const time = Date.now();
-    publishData({time, data: {name: 'Ahmed'}});
+    const {name, uid} = props.currentUser;
+
+    // More fields in future would be added here after its structure being pushed
+    // in devices -> sesnorId -> dataTypes
+    const packet = {
+      'No of Steps': count,
+    };
+
+    publishData(uid, name, {time, data: packet}, setIsPublishing);
   };
 
   return (
@@ -172,6 +182,7 @@ const Untitled = props => {
               text="Send Data"
               onPress={publishDataHandler}
               style={styles.materialButtonViolet}
+              isDisabled={isPublishing}
             />
           </View>
         </View>
@@ -187,11 +198,7 @@ const Untitled = props => {
             <Text style={styles.popupText}>
               You have not allowed Location Permission!{' '}
             </Text>
-            <Button
-              title="ALLOW"
-              color="#3F51B5"
-              onPress={() => requestLocationPermission()}
-            />
+            <Button title="ALLOW" color="#3F51B5" />
           </View>
         )}
       </SafeAreaView>

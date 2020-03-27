@@ -15,7 +15,7 @@ const SplashScreen = ({navigation}) => {
       <ScrollView>
         <View style={styles.container}>
           <Image
-            source={require('./LoginScreen/src/assets/images/HealthEarnLogo.png')}
+            source={require('../LoginScreen/src/assets/images/HealthEarnLogo.png')}
             resizeMode="contain"
             style={styles.image}
           />

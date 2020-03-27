@@ -4,13 +4,19 @@ import {
   StyleSheet,
   View,
   Image,
+  Alert,
   Text,
   ScrollView,
   AsyncStorage,
 } from 'react-native';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-import firebase from '../../../../firebase';
+// import firebase from '../../../../firebase';
+import {
+  checkUsername,
+  register,
+  createUserHealthProfile,
+} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -20,52 +26,98 @@ const Untitled1 = props => {
   const [usernameErrMsg, setUsernameErrMsg] = useState(false);
   const [passwordErrMsg, setPasswordErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  // const h = {
+  //   additionalUserInfo: {isNewUser: true, providerId: 'password'},
+  //   credential: null,
+  //   operationType: 'signIn',
+  //   user: {
+  //     apiKey: 'AIzaSyA8zuDkFpCatxEyHTjOqypps31UXUyadms',
+  //     appName: '[DEFAULT]',
+  //     authDomain: 'iota-data-marketplace-b074f.firebaseapp.com',
+  //     createdAt: '1584982393868',
+  //     displayName: null,
+  //     email: 'abdulhaseeb13mar@gmail.com',
+  //     emailVerified: false,
+  //     isAnonymous: false,
+  //     lastLoginAt: '1584982393868',
+  //     phoneNumber: null,
+  //     photoURL: null,
+  //     providerData: [Array],
+  //     redirectEventId: null,
+  //     stsTokenManager: [Object],
+  //     tenantId: null,
+  //     uid: 'VrWuMnjEmIUOLK9lRrG5gMwEkBr1',
+  //   },
+  // };
 
-  const signUp = () => {
-    if (isFormValid()) {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email.trim(), password)
-        .then(createdUser => {
-          createdUser.user.updateProfile({
-            displayName: username,
-          });
+  const signUp = async () => {
+    try {
+      if (await isFormValid()) {
+        const response = await register(username, email.trim(), password);
+        if (response.status) {
           setemailErrMsg('');
           setPasswordErrMsg('');
           setUsernameErrMsg('');
-          AsyncStorage.multiSet(
+          await AsyncStorage.multiSet(
+            // eslint-disable-next-line prettier/prettier
             [
               ['name', username],
               ['email', email],
-              ['uid', createdUser.user.uid],
+              ['uid', response.user.uid],
             ],
             error => {
-              console.log('setData error:', error);
+              error ? console.log('setData error:', error) : null;
             },
           );
+          console.log(response.user.uid);
+          // Wait at least 5 seconds so that users collection is updated in firestore
+          setTimeout(() => {
+            createUserHealthProfile({
+              uid: response.user.uid,
+              name: username,
+            });
+          }, 5000);
           props.userToken();
-        })
-        .catch(err => {
+        } else {
           setLoading(false);
-          if (err.message.includes('email')) {
-            setemailErrMsg(err.message);
+          if (response.message.includes('email')) {
+            if (response.message.includes('formatted')) {
+              setemailErrMsg(response.message);
+            } else if (response.message.includes('already')) {
+              setemailErrMsg('Email already in use');
+            }
             setPasswordErrMsg('');
             setUsernameErrMsg('');
-          } else if (err.message.includes('Password')) {
-            setPasswordErrMsg(err.message);
+          } else if (
+            response.message.includes('Password') ||
+            response.message.includes('password')
+          ) {
+            setPasswordErrMsg(response.message);
             setUsernameErrMsg('');
             setemailErrMsg('');
           }
-        });
-    } else {
-      setLoading(false);
-      setUsernameErrMsg('Please Enter Your Name');
+        }
+      } else {
+        setLoading(false);
+      }
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Error occured while signing up');
     }
   };
-  const isFormValid = () => {
+  const isFormValid = async () => {
     if (username !== '') {
-      return true;
+      const isUsernameValid = await checkUsername(username);
+      if (isUsernameValid) {
+        setUsernameErrMsg('This Username Already Exists');
+        setPasswordErrMsg('');
+        setemailErrMsg('');
+        return false;
+      } else {
+        return true;
+      }
     } else {
+      setUsernameErrMsg('Please Enter Your Name');
       return false;
     }
   };
@@ -80,7 +132,7 @@ const Untitled1 = props => {
         />
         <MaterialMessageTextbox
           text1="Username"
-          textInput1="Enter your Name"
+          textInput1="Enter your Username"
           style={styles.signupUsername}
           error={usernameErrMsg ? true : false}
           errorMessage={usernameErrMsg ? usernameErrMsg : null}
