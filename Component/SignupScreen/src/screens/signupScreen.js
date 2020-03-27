@@ -12,8 +12,11 @@ import {
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 // import firebase from '../../../../firebase';
-import {checkUsername, register} from '../../../Firebase';
-import {createUserHealthProfile} from '../../../Firebase';
+import {
+  checkUsername,
+  register,
+  createUserHealthProfile,
+} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -67,10 +70,13 @@ const Untitled1 = props => {
             },
           );
           console.log(response.user.uid);
-          await createUserHealthProfile({
-            uid: response.user.uid,
-            name: username,
-          });
+          // Wait at least 5 seconds so that users collection is updated in firestore
+          setTimeout(() => {
+            createUserHealthProfile({
+              uid: response.user.uid,
+              name: username,
+            });
+          }, 5000);
           props.userToken();
         } else {
           setLoading(false);
