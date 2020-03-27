@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Image,
+  Alert,
   Text,
   ScrollView,
   AsyncStorage,
@@ -11,8 +12,11 @@ import {
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 // import firebase from '../../../../firebase';
-import {checkUsername, register} from '../../../Firebase';
-import {createUserHealthProfile} from '../../../Firebase';
+import {
+  checkUsername,
+  register,
+  createUserHealthProfile,
+} from '../../../Firebase';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -47,49 +51,58 @@ const Untitled1 = props => {
   // };
 
   const signUp = async () => {
-    if (await isFormValid()) {
-      const response = await register(username, email.trim(), password);
-      if (response.status) {
-        setemailErrMsg('');
-        setPasswordErrMsg('');
-        setUsernameErrMsg('');
-        await AsyncStorage.multiSet(
-          // eslint-disable-next-line prettier/prettier
-          [
-            ['name', username],
-            ['email', email],
-            ['uid', response.user.uid],
-          ],
-          error => {
-            error ? console.log('setData error:', error) : null;
-          },
-        );
-        await createUserHealthProfile({
-          uid: response.user.uid,
-          name: username,
-        });
-        props.userToken();
-      } else {
-        setLoading(false);
-        if (response.message.includes('email')) {
-          if (response.message.includes('formatted')) {
-            setemailErrMsg(response.message);
-          } else if (response.message.includes('already')) {
-            setemailErrMsg('Email already in use');
-          }
+    try {
+      if (await isFormValid()) {
+        const response = await register(username, email.trim(), password);
+        if (response.status) {
+          setemailErrMsg('');
           setPasswordErrMsg('');
           setUsernameErrMsg('');
-        } else if (
-          response.message.includes('Password') ||
-          response.message.includes('password')
-        ) {
-          setPasswordErrMsg(response.message);
-          setUsernameErrMsg('');
-          setemailErrMsg('');
+          await AsyncStorage.multiSet(
+            // eslint-disable-next-line prettier/prettier
+            [
+              ['name', username],
+              ['email', email],
+              ['uid', response.user.uid],
+            ],
+            error => {
+              error ? console.log('setData error:', error) : null;
+            },
+          );
+          console.log(response.user.uid);
+          // Wait at least 5 seconds so that users collection is updated in firestore
+          setTimeout(() => {
+            createUserHealthProfile({
+              uid: response.user.uid,
+              name: username,
+            });
+          }, 5000);
+          props.userToken();
+        } else {
+          setLoading(false);
+          if (response.message.includes('email')) {
+            if (response.message.includes('formatted')) {
+              setemailErrMsg(response.message);
+            } else if (response.message.includes('already')) {
+              setemailErrMsg('Email already in use');
+            }
+            setPasswordErrMsg('');
+            setUsernameErrMsg('');
+          } else if (
+            response.message.includes('Password') ||
+            response.message.includes('password')
+          ) {
+            setPasswordErrMsg(response.message);
+            setUsernameErrMsg('');
+            setemailErrMsg('');
+          }
         }
+      } else {
+        setLoading(false);
       }
-    } else {
-      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Error occured while signing up');
     }
   };
   const isFormValid = async () => {
@@ -119,7 +132,7 @@ const Untitled1 = props => {
         />
         <MaterialMessageTextbox
           text1="Username"
-          textInput1="Enter your Name"
+          textInput1="Enter your Username"
           style={styles.signupUsername}
           error={usernameErrMsg ? true : false}
           errorMessage={usernameErrMsg ? usernameErrMsg : null}

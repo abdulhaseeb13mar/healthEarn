@@ -35,30 +35,35 @@ export const checkUsername = async name => {
 };
 
 export const createUserHealthProfile = async user => {
-  const apiKey = (await api.get('user', {userId: user.uid})).apiKey;
+  try {
+    const obj = await api.get('user', {userId: user.uid});
+    console.log(obj);
+    const {apiKey} = obj;
+    // Assign to user
+    const profile = {
+      sensorId: user.name,
+      type: 'health',
+      healthData: true,
+      dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
+      price: 100,
+      date: moment().format('DD MMMM, YYYY H:mm a'),
+    };
 
-  // Assign to user
-  const profile = {
-    sensorId: user.name,
-    type: 'health',
-    healthData: true,
-    dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
-    price: 100,
-    date: moment().format('DD MMMM, YYYY H:mm a'),
-  };
+    profile.owner = user.uid;
+    // Deactivate the Device
+    profile.inactive = true;
 
-  profile.owner = user.uid;
-  // Deactivate the Device
-  profile.inactive = true;
+    const packet = {
+      apiKey,
+      id: profile.sensorId,
+      device: profile,
+    };
 
-  const packet = {
-    apiKey,
-    id: profile.sensorId,
-    device: profile,
-  };
-
-  // Call server
-  await api.post('newDevice', packet);
+    // Call server
+    await api.post('newDevice', packet);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 // export const register = async (name, email, password) => {
