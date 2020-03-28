@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-unused-vars */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
   View,
@@ -18,6 +18,7 @@ import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from 'react-native-easy-toast';
 import localScopes from '../../../../scopes';
 import {publishData} from '../iota';
 
@@ -29,6 +30,8 @@ const Untitled = props => {
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const toastRef = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -135,7 +138,11 @@ const Untitled = props => {
       'No of Steps': count,
     };
 
-    publishData(uid, name, {time, data: packet}, setIsPublishing);
+    publishData(uid, name, {time, data: packet}, setIsPublishing, showToast);
+  };
+
+  const showToast = (message, duration = 3000) => {
+    toastRef.current.show(message, duration);
   };
 
   return (
@@ -143,6 +150,13 @@ const Untitled = props => {
       keyboardVerticalOffset={10}
       behavior="padding"
       style={{flex: 1}}>
+      <Toast
+        ref={toastRef}
+        style={{
+          backgroundColor: '#3F51B5',
+          borderRadius: 10,
+        }}
+      />
       <SafeAreaView>
         <View style={styles.container}>
           <View style={styles.innerContainer}>
