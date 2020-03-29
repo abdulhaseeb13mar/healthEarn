@@ -44,6 +44,7 @@ export const createUserHealthProfile = async user => {
       sensorId: user.name,
       type: 'health',
       healthData: true,
+      buyers: [],
       dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
       price: 100,
       date: moment().format('DD MMMM, YYYY H:mm a'),
