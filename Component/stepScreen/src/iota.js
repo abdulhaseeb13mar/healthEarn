@@ -16,7 +16,13 @@ const generateRandomKey = length => {
   ).join('');
 };
 
-export const publishData = async (userId, username, packet, loadingHandler) => {
+export const publishData = async (
+  userId,
+  username,
+  packet,
+  loadingHandler,
+  showToast,
+) => {
   try {
     const res = await api.get('getSk', {userId, username});
     if (!res) {
@@ -48,20 +54,26 @@ export const publishData = async (userId, username, packet, loadingHandler) => {
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
-    await storeKeysOnFirebase(sk, username, {
-      sidekey: mamKey,
-      root: message.root,
-      time: packet.time,
-    });
+    await storeKeysOnFirebase(
+      sk,
+      username,
+      {
+        sidekey: mamKey,
+        root: message.root,
+        time: packet.time,
+      },
+      showToast,
+    );
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
+    showToast('Error occured while publishing data to tangle');
   } finally {
     loadingHandler(false);
   }
 };
 
-const storeKeysOnFirebase = async (sk, username, packet) => {
+const storeKeysOnFirebase = async (sk, username, packet, showToast) => {
   const sensorId = username;
   try {
     await axios.post(iotaConfig.firebaseEndPoint, {
@@ -70,7 +82,9 @@ const storeKeysOnFirebase = async (sk, username, packet) => {
       sk,
     });
     console.log('saved in firebase');
+    showToast('Data published successfully');
   } catch (e) {
     console.log(e);
+    showToast('Error occured while storing keys to firestore');
   }
 };
