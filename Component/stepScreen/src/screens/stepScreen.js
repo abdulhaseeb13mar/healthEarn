@@ -30,6 +30,7 @@ const Untitled = props => {
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [toastColor, setToastColor] = useState('black');
 
   const toastRef = useRef(null);
 
@@ -141,7 +142,8 @@ const Untitled = props => {
     publishData(uid, name, {time, data: packet}, setIsPublishing, showToast);
   };
 
-  const showToast = (message, duration = 3000) => {
+  const showToast = (message, type = 'black', duration = 10000) => {
+    setToastColor(type);
     toastRef.current.show(message, duration);
   };
 
@@ -153,7 +155,7 @@ const Untitled = props => {
       <Toast
         ref={toastRef}
         style={{
-          backgroundColor: '#3F51B5',
+          backgroundColor: toastColor,
           borderRadius: 10,
         }}
       />

@@ -1,9 +1,14 @@
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {Text} from 'react-native';
 import Mam from '@iota/mam';
 import crypto from 'crypto';
 import {asciiToTrytes} from '@iota/converter';
 import axios from 'axios';
 import iotaConfig from '../../../config';
 import api from '../../../utils/api';
+import CheckIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import CancelIcon from 'react-native-vector-icons/MaterialIcons';
 
 // Random Key Generator
 const generateRandomKey = length => {
@@ -67,7 +72,10 @@ export const publishData = async (
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
-    showToast('Error occured while publishing data to tangle');
+    showToast(
+      toastGenerator('Error occured while publishing data to tangle', false),
+      'red',
+    );
   } finally {
     loadingHandler(false);
   }
@@ -82,9 +90,26 @@ const storeKeysOnFirebase = async (sk, username, packet, showToast) => {
       sk,
     });
     console.log('saved in firebase');
-    showToast('Data published successfully');
+    showToast(toastGenerator('Data published successfully', true));
   } catch (e) {
     console.log(e);
-    showToast('Error occured while storing keys to firestore');
+    showToast(
+      toastGenerator('Error occured while storing keys to firestore', false),
+      'red',
+    );
   }
+};
+
+const toastGenerator = (message, success) => {
+  return (
+    <Text>
+      {' '}
+      <Text style={{color: 'white'}}>{message}</Text>{' '}
+      {success ? (
+        <CheckIcon name="check-circle" size={20} color="#4caf50" />
+      ) : (
+        <CancelIcon name="cancel" size={20} color="#9b0000" />
+      )}
+    </Text>
+  );
 };
