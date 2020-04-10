@@ -48,6 +48,7 @@ export const createUserHealthProfile = async user => {
       dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
       price: 100,
       date: moment().format('DD MMMM, YYYY H:mm a'),
+      subscribers: [],
     };
 
     profile.owner = user.uid;

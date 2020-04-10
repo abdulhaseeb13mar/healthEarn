@@ -27,12 +27,14 @@ export const publishData = async (
   packet,
   loadingHandler,
   showToast,
+  progress,
 ) => {
   try {
     const res = await api.get('getSk', {userId, username});
     if (!res) {
       return;
     }
+    progress(0.4);
     const {sk} = res;
 
     // Initialise MAM State
@@ -59,6 +61,8 @@ export const publishData = async (
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
+    progress(0.8);
+
     await storeKeysOnFirebase(
       sk,
       username,
@@ -69,6 +73,7 @@ export const publishData = async (
       },
       showToast,
     );
+    progress(1);
     console.log('Data published');
   } catch (e) {
     console.log('error', e);

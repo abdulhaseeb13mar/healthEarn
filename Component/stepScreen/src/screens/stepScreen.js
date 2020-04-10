@@ -16,11 +16,15 @@ import {
 import GoogleFit from 'react-native-google-fit';
 import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
-import MaterialButtonViolet from '../components/MaterialButtonViolet';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-easy-toast';
 import localScopes from '../../../../scopes';
+import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import {publishData} from '../iota';
+import {InitialPopup} from '../components/initialPopup';
+import {SecondPopup} from '../components/secondPopup';
+// import {stepsRetrieverFunc} from '../components/stepsRetriever';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -31,6 +35,9 @@ const Untitled = props => {
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
+  const [initialPopup, setInitialPopup] = useState(true);
+  const [secondPopup, setSecondPopup] = useState(false);
+  const [progressValue, setProgressValue] = useState(0);
 
   const toastRef = useRef(null);
 
@@ -94,6 +101,14 @@ const Untitled = props => {
   };
 
   //--------------------retrieve steps----------------------------
+  // const stepsRetriever = () => {
+  //   const steps = stepsRetrieverFunc();
+  //   setCount(steps);
+  //   setTimeout(() => {
+  //     setIsDisabledRefreshBtn(false);
+  //   }, 3500);
+  //   setIsLoading(false);
+  // }
   const stepsRetriever = () => {
     const retrieveOptions = {
       // startDate: new Date(
@@ -117,8 +132,10 @@ const Untitled = props => {
               : setCount(0);
             setTimeout(() => {
               setIsDisabledRefreshBtn(false);
+              console.log(isLoading);
             }, 3500);
             setIsLoading(false);
+            console.log(isLoading);
             break;
           }
         }
@@ -139,7 +156,18 @@ const Untitled = props => {
       'No of Steps': count,
     };
 
-    publishData(uid, name, {time, data: packet}, setIsPublishing, showToast);
+    publishData(
+      uid,
+      name,
+      {time, data: packet},
+      setIsPublishing,
+      showToast,
+      progress,
+    );
+  };
+
+  const progress = value => {
+    setProgressValue(value);
   };
 
   const showToast = (message, type = 'black', duration = 10000) => {
@@ -160,6 +188,21 @@ const Untitled = props => {
         }}
       />
       <SafeAreaView>
+        {initialPopup ? (
+          <Modal style={styles.modal} isVisible={true}>
+            {secondPopup ? (
+              <SecondPopup progress={progressValue} />
+            ) : (
+              <InitialPopup
+                nextPopup={() => {
+                  setSecondPopup(true);
+                  publishDataHandler();
+                }}
+              />
+            )}
+          </Modal>
+        ) : null}
+
         <View style={styles.container}>
           <View style={styles.innerContainer}>
             <Text style={styles.UpperLine}>Hello {props.currentUser.name}</Text>
@@ -167,7 +210,7 @@ const Untitled = props => {
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
                 {isLoading ? (
-                  <Text>0</Text>
+                  <Text>2</Text>
                 ) : (
                   <AnimateNumber
                     value={count}
@@ -229,6 +272,11 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     marginTop: 50,
+  },
+  modal: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   stepsLine: {
     justifyContent: 'space-between',

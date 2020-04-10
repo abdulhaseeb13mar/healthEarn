@@ -46,19 +46,17 @@ const App: () => React$Node = () => {
         {currentUser.uid == null ? (
           <>
             <Stack.Screen name="Login">
-              {(props) => (
-                <Login {...props} userToken={() => fetchUserToken()} />
-              )}
+              {props => <Login {...props} userToken={() => fetchUserToken()} />}
             </Stack.Screen>
             <Stack.Screen name="Signup">
-              {(props) => (
+              {props => (
                 <Signup {...props} userToken={() => fetchUserToken()} />
               )}
             </Stack.Screen>
           </>
         ) : (
           <Stack.Screen name="HomeScreen">
-            {(props) => (
+            {props => (
               <HomeScreen
                 {...props}
                 currentUser={currentUser}
