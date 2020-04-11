@@ -24,21 +24,21 @@ import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import {publishData} from '../iota';
 import {InitialPopup} from '../components/initialPopup';
 import {SecondPopup} from '../components/secondPopup';
-// import {stepsRetrieverFunc} from '../components/stepsRetriever';
+import {stepsRetrieverFunc} from '../components/stepsRetriever';
 
 const HEIGHT = Dimensions.get('window').height;
 
 const Untitled = props => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(12);
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
-  const [initialPopup, setInitialPopup] = useState(true);
+  const [initialPopup, setInitialPopup] = useState(false);
   const [secondPopup, setSecondPopup] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
-
+  const [progressMessage, setProgressMessage] = useState('');
   const toastRef = useRef(null);
 
   useEffect(() => {
@@ -101,49 +101,47 @@ const Untitled = props => {
   };
 
   //--------------------retrieve steps----------------------------
-  // const stepsRetriever = () => {
-  //   const steps = stepsRetrieverFunc();
-  //   setCount(steps);
-  //   setTimeout(() => {
-  //     setIsDisabledRefreshBtn(false);
-  //   }, 3500);
-  //   setIsLoading(false);
-  // }
-  const stepsRetriever = () => {
-    const retrieveOptions = {
-      // startDate: new Date(
-      //   moment()
-      //     .subtract(1, 'day')
-      //     .format('YYYY-MM-DD'),
-      // ).toISOString(),
-      //startDate: '2019-02-01T00:00:17.971Z',
-      startDate: new Date(
-        moment().format('YYYY-MM-DD' + 'T' + '00:00:00' + 'Z'),
-      ).toISOString(),
-      endDate: new Date().toISOString(),
-    };
-
-    GoogleFit.getDailyStepCountSamples(retrieveOptions)
-      .then(res => {
-        for (let i = 0; i < res.length; i++) {
-          if (res[i].source === 'com.google.android.gms:estimated_steps') {
-            res[i].steps.length !== 0
-              ? setCount(res[i].steps[0].value)
-              : setCount(0);
-            setTimeout(() => {
-              setIsDisabledRefreshBtn(false);
-              console.log(isLoading);
-            }, 3500);
-            setIsLoading(false);
-            console.log(isLoading);
-            break;
-          }
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+  const stepsRetriever = async () => {
+    const steps = await stepsRetrieverFunc();
+    setCount(steps);
+    setTimeout(() => {
+      setIsDisabledRefreshBtn(false);
+    }, 3500);
+    setIsLoading(false);
   };
+  // const stepsRetriever = () => {
+  //   const retrieveOptions = {
+  //     // startDate: new Date(
+  //     //   moment()
+  //     //     .subtract(1, 'day')
+  //     //     .format('YYYY-MM-DD'),
+  //     // ).toISOString(),
+  //     //startDate: '2019-02-01T00:00:17.971Z',
+  //     startDate: new Date(
+  //       moment().format('YYYY-MM-DD' + 'T' + '00:00:00' + 'Z'),
+  //     ).toISOString(),
+  //     endDate: new Date().toISOString(),
+  //   };
+
+  //   GoogleFit.getDailyStepCountSamples(retrieveOptions)
+  //     .then(res => {
+  //       for (let i = 0; i < res.length; i++) {
+  //         if (res[i].source === 'com.google.android.gms:estimated_steps') {
+  //           res[i].steps.length !== 0
+  //             ? setCount(res[i].steps[0].value)
+  //             : setCount(0);
+  //           setTimeout(() => {
+  //             setIsDisabledRefreshBtn(false);
+  //           }, 3500);
+  //           setIsLoading(false);
+  //           break;
+  //         }
+  //       }
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // };
 
   const publishDataHandler = () => {
     setIsPublishing(true);
@@ -166,8 +164,9 @@ const Untitled = props => {
     );
   };
 
-  const progress = value => {
+  const progress = (value, message) => {
     setProgressValue(value);
+    setProgressMessage(message);
   };
 
   const showToast = (message, type = 'black', duration = 10000) => {
@@ -191,7 +190,7 @@ const Untitled = props => {
         {initialPopup ? (
           <Modal style={styles.modal} isVisible={true}>
             {secondPopup ? (
-              <SecondPopup progress={progressValue} />
+              <SecondPopup message={progressMessage} progress={progressValue} />
             ) : (
               <InitialPopup
                 nextPopup={() => {

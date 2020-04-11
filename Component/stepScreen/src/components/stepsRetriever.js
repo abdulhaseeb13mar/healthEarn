@@ -1,7 +1,8 @@
 import GoogleFit from 'react-native-google-fit';
 import moment from 'moment';
 
-export const stepsRetrieverFunc = () => {
+export const stepsRetrieverFunc = async () => {
+  let steps = 0;
   const retrieveOptions = {
     // startDate: new Date(
     //   moment()
@@ -15,19 +16,18 @@ export const stepsRetrieverFunc = () => {
     endDate: new Date().toISOString(),
   };
 
-  GoogleFit.getDailyStepCountSamples(retrieveOptions)
+  await GoogleFit.getDailyStepCountSamples(retrieveOptions)
     .then(res => {
       for (let i = 0; i < res.length; i++) {
-        if (res[i].source === 'com.google.android.gms:estimated_steps') {
-          if (res[i].steps.length !== 0) {
-            return res[i].steps[0].value;
-          } else {
-            return 0;
-          }
-        }
+        res[i].source === 'com.google.android.gms:estimated_steps'
+          ? res[i].steps.length !== 0
+            ? (steps = res[i].steps[0].value)
+            : null
+          : null;
       }
     })
     .catch(err => {
       console.log(err);
     });
+  return steps;
 };

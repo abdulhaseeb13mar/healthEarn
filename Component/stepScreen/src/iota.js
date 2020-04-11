@@ -34,7 +34,7 @@ export const publishData = async (
     if (!res) {
       return;
     }
-    progress(0.4);
+    progress(0.4, 'waiting for api...');
     const {sk} = res;
 
     // Initialise MAM State
@@ -61,7 +61,7 @@ export const publishData = async (
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
-    progress(0.8);
+    progress(0.8, 'attaching mam...');
 
     await storeKeysOnFirebase(
       sk,
@@ -73,7 +73,7 @@ export const publishData = async (
       },
       showToast,
     );
-    progress(1);
+    progress(1, 'Sent!');
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
