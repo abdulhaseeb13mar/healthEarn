@@ -5,26 +5,22 @@ import {
   StyleSheet,
   View,
   Text,
-  PermissionsAndroid,
   SafeAreaView,
   KeyboardAvoidingView,
-  AsyncStorage,
   Dimensions,
   Button,
-  Alert,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import AnimateNumber from 'react-native-countup';
-import moment from 'moment';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-easy-toast';
-import localScopes from '../../../../scopes';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import {publishData} from '../iota';
 import {InitialPopup} from '../components/initialPopup';
 import {SecondPopup} from '../components/secondPopup';
 import {stepsRetrieverFunc} from '../components/stepsRetriever';
+import {locationAuthorizeFunc} from '../components/locationAuthorize';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -50,54 +46,9 @@ const Untitled = props => {
   }, []);
 
   const locationAuthorize = async () => {
-    const options = {
-      scopes: [
-        localScopes.FITNESS_ACTIVITY_READ_WRITE,
-        localScopes.FITNESS_BODY_READ_WRITE,
-      ],
-    };
-    await GoogleFit.authorize(options)
-      .then(async authResult => {
-        if (authResult.success) {
-          let loc_perm = await requestLocationPermission();
-          if (loc_perm) {
-            GoogleFit.startRecording(x => {
-              console.log(x);
-            });
-          }
-        } else {
-          return Alert.alert(
-            'Alert!',
-            'Please Select your account for Google Fit',
-            [{text: 'OK', onPress: () => locationAuthorize()}],
-            {cancelable: false},
-          );
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    const loc_perm = await locationAuthorizeFunc();
+    setLocationAllowed(loc_perm);
     stepsRetriever();
-  };
-
-  const requestLocationPermission = async () => {
-    try {
-      const fineGranted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (fineGranted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the fine location');
-        setLocationAllowed(true);
-        return true;
-      } else {
-        console.log('Location permission denied');
-        setLocationAllowed(false);
-        return false;
-      }
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
   };
 
   //--------------------retrieve steps----------------------------
@@ -109,39 +60,6 @@ const Untitled = props => {
     }, 3500);
     setIsLoading(false);
   };
-  // const stepsRetriever = () => {
-  //   const retrieveOptions = {
-  //     // startDate: new Date(
-  //     //   moment()
-  //     //     .subtract(1, 'day')
-  //     //     .format('YYYY-MM-DD'),
-  //     // ).toISOString(),
-  //     //startDate: '2019-02-01T00:00:17.971Z',
-  //     startDate: new Date(
-  //       moment().format('YYYY-MM-DD' + 'T' + '00:00:00' + 'Z'),
-  //     ).toISOString(),
-  //     endDate: new Date().toISOString(),
-  //   };
-
-  //   GoogleFit.getDailyStepCountSamples(retrieveOptions)
-  //     .then(res => {
-  //       for (let i = 0; i < res.length; i++) {
-  //         if (res[i].source === 'com.google.android.gms:estimated_steps') {
-  //           res[i].steps.length !== 0
-  //             ? setCount(res[i].steps[0].value)
-  //             : setCount(0);
-  //           setTimeout(() => {
-  //             setIsDisabledRefreshBtn(false);
-  //           }, 3500);
-  //           setIsLoading(false);
-  //           break;
-  //         }
-  //       }
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     });
-  // };
 
   const publishDataHandler = () => {
     setIsPublishing(true);
@@ -209,7 +127,7 @@ const Untitled = props => {
             <Text style={styles.stepsLine}>
               <Text style={styles.loremIpsum}>
                 {isLoading ? (
-                  <Text>2</Text>
+                  <Text>0</Text>
                 ) : (
                   <AnimateNumber
                     value={count}
