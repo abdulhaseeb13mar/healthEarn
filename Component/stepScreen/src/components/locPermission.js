@@ -5,7 +5,7 @@ export const requestLocationPermissionFunc = async () => {
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     );
     if (fineGranted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('You can use the fine location');
+      // console.log('You can use the fine location');
       return true;
     } else {
       console.log('Location permission denied');

@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Button,
+  AsyncStorage,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import AnimateNumber from 'react-native-countup';
@@ -21,6 +22,7 @@ import {InitialPopup} from '../components/initialPopup';
 import {SecondPopup} from '../components/secondPopup';
 import {stepsRetrieverFunc} from '../components/stepsRetriever';
 import {locationAuthorizeFunc} from '../components/locationAuthorize';
+import moment from 'moment';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -31,7 +33,7 @@ const Untitled = props => {
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
-  const [initialPopup, setInitialPopup] = useState(false);
+  const [initialPopup, setInitialPopup] = useState(true);
   const [secondPopup, setSecondPopup] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
@@ -53,7 +55,14 @@ const Untitled = props => {
 
   //--------------------retrieve steps----------------------------
   const stepsRetriever = async () => {
-    const steps = await stepsRetrieverFunc();
+    const steps = await stepsRetrieverFunc({
+      startDate: new Date(
+        moment()
+          .startOf('day')
+          .format(),
+      ).toISOString(),
+      endDate: new Date().toISOString(),
+    });
     setCount(steps);
     setTimeout(() => {
       setIsDisabledRefreshBtn(false);
@@ -61,15 +70,27 @@ const Untitled = props => {
     setIsLoading(false);
   };
 
-  const publishDataHandler = () => {
+  const publishDataHandler = date => {
     setIsPublishing(true);
-    const time = Date.now();
+    const steps = stepsRetrieverFunc({
+      startDate: new Date(
+        moment(date)
+          .startOf('day')
+          .format(),
+      ).toISOString(),
+      endDate: new Date(
+        moment(date)
+          .endOf('day')
+          .format(),
+      ).toISOString(),
+    });
+    const time = moment(date).valueOf();
     const {name, uid} = props.currentUser;
 
     // More fields in future would be added here after its structure being pushed
     // in devices -> sesnorId -> dataTypes
     const packet = {
-      'No of Steps': count,
+      'No of Steps': steps,
     };
 
     publishData(
@@ -85,11 +106,42 @@ const Untitled = props => {
   const progress = (value, message) => {
     setProgressValue(value);
     setProgressMessage(message);
+    return true;
   };
 
   const showToast = (message, type = 'black', duration = 10000) => {
     setToastColor(type);
     toastRef.current.show(message, duration);
+  };
+
+  const testingDates = async () => {
+    // let a = moment('2020-04-03T06:17:23+05:00')
+    //   .format()
+    //   .toString();
+
+    // await AsyncStorage.setItem('LatestUpdate', a, err =>
+    //   console.log('error :', err),
+    // );
+
+    let fetchedDate;
+    await AsyncStorage.getItem('LatestUpdate', (_err, result) => {
+      console.log('result ', result);
+      fetchedDate = result;
+    });
+
+    let diff = moment(moment()).diff(fetchedDate, 'days');
+    if (diff === 0) {
+      return console.log('Already Upto Date');
+    }
+    let updatedDate = fetchedDate;
+    while (diff !== 0) {
+      publishDataHandler(updatedDate);
+      updatedDate = moment(updatedDate)
+        .add(1, 'days')
+        .format();
+      console.log('updatedDate: ', updatedDate);
+      diff = moment(moment()).diff(updatedDate, 'days');
+    }
   };
 
   return (
@@ -113,7 +165,7 @@ const Untitled = props => {
               <InitialPopup
                 nextPopup={() => {
                   setSecondPopup(true);
-                  publishDataHandler();
+                  publishDataHandler('2020-04-10T06:17:23+05:00');
                 }}
               />
             )}
@@ -159,6 +211,11 @@ const Untitled = props => {
               onPress={publishDataHandler}
               style={styles.materialButtonViolet}
               isDisabled={isPublishing}
+            />
+            <MaterialButtonViolet
+              text="Date"
+              onPress={testingDates}
+              style={styles.materialButtonViolet}
             />
           </View>
         </View>

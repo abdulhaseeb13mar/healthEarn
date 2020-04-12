@@ -34,7 +34,7 @@ export const publishData = async (
     if (!res) {
       return;
     }
-    progress(0.4, 'waiting for api...');
+    await progress(0.4, 'waiting for api...');
     const {sk} = res;
 
     // Initialise MAM State
@@ -61,8 +61,7 @@ export const publishData = async (
     console.log(message, message.root);
     // Attach the payload.
     await Mam.attach(message.payload, message.address);
-    progress(0.8, 'attaching mam...');
-
+    await progress(0.8, 'attaching mam...');
     await storeKeysOnFirebase(
       sk,
       username,
@@ -73,8 +72,9 @@ export const publishData = async (
       },
       showToast,
     );
-    progress(1, 'Sent!');
+    await progress(1, 'Sent!');
     console.log('Data published');
+    await progress(0, '');
   } catch (e) {
     console.log('error', e);
     showToast(
@@ -117,4 +117,12 @@ const toastGenerator = (message, success) => {
       )}
     </Text>
   );
+};
+
+const sleep = milliseconds => {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
 };
