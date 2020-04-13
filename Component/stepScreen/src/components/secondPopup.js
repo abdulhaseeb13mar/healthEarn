@@ -13,7 +13,7 @@ export const SecondPopup = props => (
     </CardItem>
     <CardItem>
       <ProgressBar
-        progress={props.progress}
+        progress={props.progress / 100}
         borderWidth={2}
         color="#3F51B5"
         height={10}

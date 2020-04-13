@@ -21,6 +21,13 @@ const generateRandomKey = length => {
   ).join('');
 };
 
+const faker = () =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    });
+  });
+
 export const publishData = async (
   userId,
   username,
@@ -30,40 +37,63 @@ export const publishData = async (
   progress,
 ) => {
   try {
-    const res = await api.get('getSk', {userId, username});
+    let secretKey;
+    let message;
+    let mamKey;
+    let res;
+    await progress(0, 'awaiting for api...');
+    await faker();
+    console.log('1');
+    res = await api.get('getSk', {userId, username});
+
+    console.log('2');
     if (!res) {
       return;
     }
-    await progress(0.4, 'waiting for api...');
-    const {sk} = res;
 
+    let {sk} = res;
+    secretKey = sk;
     // Initialise MAM State
     let mamState = Mam.init(iotaConfig.provider);
+    await progress(20, 'Generating Key...');
+    await faker();
+    console.log('3');
 
+    console.log('4');
     // const time = Date.now();
     // const packet = {time, data: {name: 'Ahmed'}};
-
+    // setTimeout(async () => {
     // Change MAM encryption key on each loop
-    let mamKey = generateRandomKey(81);
+    mamKey = generateRandomKey(81);
 
+    console.log('5');
     // Set channel mode & update key
     mamState = Mam.changeMode(mamState, 'restricted', mamKey);
 
     // Create Trytes
     const trytes = asciiToTrytes(JSON.stringify(packet));
 
+    console.log('6');
     // Get MAM payload
-    const message = Mam.create(mamState, trytes);
+    await progress(40, 'Creating Message...');
+    await faker();
+    message = Mam.create(mamState, trytes);
 
+    console.log('7');
     // Save new mamState
     mamState = message.state;
 
     console.log(message, message.root);
-    // Attach the payload.
-    await Mam.attach(message.payload, message.address);
-    await progress(0.8, 'attaching mam...');
+
+    // Attach the payload. BTW thats not 80% :D abi toh asal mkam shuru hoga, attaching data to tangle and storing keys on firrebase
+    await progress(80, 'attaching mam...');
+    await faker();
+    await Mam.attach(message.payload, message.address, 3, 10);
+
+    await progress(90, 'storing key...');
+    await faker();
     await storeKeysOnFirebase(
-      sk,
+      secretKey,
       username,
       {
         sidekey: mamKey,
@@ -72,9 +102,9 @@ export const publishData = async (
       },
       showToast,
     );
-    await progress(1, 'Sent!');
+    await progress(100, 'Sent!');
+    await faker();
     console.log('Data published');
-    await progress(0, '');
   } catch (e) {
     console.log('error', e);
     showToast(
@@ -117,12 +147,4 @@ const toastGenerator = (message, success) => {
       )}
     </Text>
   );
-};
-
-const sleep = milliseconds => {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
 };

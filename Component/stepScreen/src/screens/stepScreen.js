@@ -27,7 +27,7 @@ import moment from 'moment';
 const HEIGHT = Dimensions.get('window').height;
 
 const Untitled = props => {
-  const [count, setCount] = useState(12);
+  const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
@@ -70,9 +70,9 @@ const Untitled = props => {
     setIsLoading(false);
   };
 
-  const publishDataHandler = date => {
+  const publishDataHandler = async date => {
     setIsPublishing(true);
-    const steps = stepsRetrieverFunc({
+    const steps = await stepsRetrieverFunc({
       startDate: new Date(
         moment(date)
           .startOf('day')
@@ -84,6 +84,7 @@ const Untitled = props => {
           .format(),
       ).toISOString(),
     });
+    console.log(date, steps);
     const time = moment(date).valueOf();
     const {name, uid} = props.currentUser;
 
@@ -93,7 +94,7 @@ const Untitled = props => {
       'No of Steps': steps,
     };
 
-    publishData(
+    await publishData(
       uid,
       name,
       {time, data: packet},
@@ -123,24 +124,31 @@ const Untitled = props => {
     //   console.log('error :', err),
     // );
 
-    let fetchedDate;
-    await AsyncStorage.getItem('LatestUpdate', (_err, result) => {
-      console.log('result ', result);
-      fetchedDate = result;
-    });
+    let fetchedDate = '2020-04-11T06:17:23+05:00';
+    // await AsyncStorage.getItem('LatestUpdate', (_err, result) => {
+    //   console.log('result ', result);
+    //   fetchedDate = result;
+    // });
 
     let diff = moment(moment()).diff(fetchedDate, 'days');
     if (diff === 0) {
       return console.log('Already Upto Date');
     }
     let updatedDate = fetchedDate;
-    while (diff !== 0) {
-      publishDataHandler(updatedDate);
-      updatedDate = moment(updatedDate)
-        .add(1, 'days')
-        .format();
-      console.log('updatedDate: ', updatedDate);
-      diff = moment(moment()).diff(updatedDate, 'days');
+    for (let i = 0; i < diff; i++) {
+      const abc = await publishDataHandler(updatedDate);
+      console.log('done, ', i), abc;
+      setTimeout(() => {
+        updatedDate = moment(updatedDate)
+          .add(1, 'days')
+          .format();
+        console.log('updatedDate: ', updatedDate);
+      });
+
+      // diff = moment(moment()).diff(updatedDate, 'days');
+      // if (diff === 0) {
+      //   break;
+      // }
     }
   };
 
@@ -165,7 +173,7 @@ const Untitled = props => {
               <InitialPopup
                 nextPopup={() => {
                   setSecondPopup(true);
-                  publishDataHandler('2020-04-10T06:17:23+05:00');
+                  testingDates();
                 }}
               />
             )}
