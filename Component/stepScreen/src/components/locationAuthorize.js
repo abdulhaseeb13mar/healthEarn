@@ -17,7 +17,7 @@ export const locationAuthorizeFunc = async () => {
         loc_perm = await requestLocationPermissionFunc();
         if (loc_perm) {
           GoogleFit.startRecording(x => {
-            // console.log(x);
+            console.log(x);
           });
         }
       } else {

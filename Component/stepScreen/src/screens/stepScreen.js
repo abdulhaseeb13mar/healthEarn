@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable no-unused-vars */
 import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
@@ -9,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Button,
-  AsyncStorage,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import moment from 'moment';
@@ -46,7 +44,6 @@ const Untitled = props => {
     setIsLoading(true);
     locationAuthorize();
     CheckLastSyncAsyncStorage();
-    // console.log(lastSync);
     return () => {
       GoogleFit.unsubscribeListeners();
     };
