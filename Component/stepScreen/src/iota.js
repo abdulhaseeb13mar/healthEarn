@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Text} from 'react-native';
+import moment from 'moment';
+import {Text, AsyncStorage} from 'react-native';
 import Mam from '@iota/mam';
 import crypto from 'crypto';
 import {asciiToTrytes} from '@iota/converter';
@@ -9,6 +10,7 @@ import iotaConfig from '../../../config';
 import api from '../../../utils/api';
 import CheckIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CancelIcon from 'react-native-vector-icons/MaterialIcons';
+import {SetLastSyncAsyncStorageFunc} from './components/setLastSync(asyncStorage)';
 
 // Random Key Generator
 const generateRandomKey = length => {
@@ -75,7 +77,7 @@ export const publishData = async (
 
     console.log('6');
     // Get MAM payload
-    await progress(40, 'Creating Message...');
+    await progress(30, 'Creating Message...');
     await faker();
     message = Mam.create(mamState, trytes);
 
@@ -86,11 +88,11 @@ export const publishData = async (
     console.log(message, message.root);
 
     // Attach the payload. BTW thats not 80% :D abi toh asal mkam shuru hoga, attaching data to tangle and storing keys on firrebase
-    await progress(80, 'attaching mam...');
+    await progress(70, 'attaching mam...');
     await faker();
     await Mam.attach(message.payload, message.address, 3, 10);
 
-    await progress(90, 'storing key...');
+    await progress(80, 'storing key...');
     await faker();
     await storeKeysOnFirebase(
       secretKey,
@@ -102,6 +104,13 @@ export const publishData = async (
       },
       showToast,
     );
+    // let x = moment(packet.time).format();
+    // console.log('x :', x);
+    SetLastSyncAsyncStorageFunc(moment(packet.time).format());
+    // await AsyncStorage.setItem('LatestUpdate', x, err =>
+    //   console.log('error :', err),
+    // );
+    await faker();
     await progress(100, 'Sent!');
     await faker();
     console.log('Data published');
@@ -125,7 +134,13 @@ const storeKeysOnFirebase = async (sk, username, packet, showToast) => {
       sk,
     });
     console.log('saved in firebase');
-    showToast(toastGenerator('Data published successfully', true));
+    showToast(
+      toastGenerator(
+        'Data published successfully for ' +
+          moment(packet.time).format('DD-MM-YY'),
+        true,
+      ),
+    );
   } catch (e) {
     console.log(e);
     showToast(

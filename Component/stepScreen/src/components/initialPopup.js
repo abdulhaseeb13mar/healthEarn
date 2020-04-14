@@ -1,14 +1,18 @@
 import React from 'react';
 import {Text, Button} from 'react-native';
 import {Card, CardItem} from 'native-base';
+import moment from 'moment';
 
 export const InitialPopup = props => (
   <Card>
     <CardItem header bordered>
-      <Text>Send your Data to Tangle</Text>
+      <Text>Please Send your Data</Text>
     </CardItem>
     <CardItem>
-      <Text>this is a body and it is going to be wide</Text>
+      <Text>
+        You have not sent your data after{'\n'}
+        {moment(props.lastSyncDate).format('DD MMMM YYYY')}{' '}
+      </Text>
     </CardItem>
     <CardItem footer>
       <Button

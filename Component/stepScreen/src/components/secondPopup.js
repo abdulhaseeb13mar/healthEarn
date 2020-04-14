@@ -9,6 +9,9 @@ export const SecondPopup = props => (
       <Text>Sending your Data to Tangle...</Text>
     </CardItem>
     <CardItem>
+      <Text>Date: {props.date}</Text>
+    </CardItem>
+    <CardItem>
       <Text>{props.message ? props.message : 'Sending...'}</Text>
     </CardItem>
     <CardItem>
@@ -20,12 +23,5 @@ export const SecondPopup = props => (
         animationConfig={{bounciness: 10}}
       />
     </CardItem>
-
-    {/* <CardItem footer>
-        <Button
-          title="Send your Data to tangle"
-          onPress={() => props.nextPopup()}
-        />
-      </CardItem> */}
   </Card>
 );

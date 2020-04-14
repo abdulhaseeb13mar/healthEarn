@@ -12,6 +12,7 @@ import {
   AsyncStorage,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
+import moment from 'moment';
 import AnimateNumber from 'react-native-countup';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,8 +23,8 @@ import {InitialPopup} from '../components/initialPopup';
 import {SecondPopup} from '../components/secondPopup';
 import {stepsRetrieverFunc} from '../components/stepsRetriever';
 import {locationAuthorizeFunc} from '../components/locationAuthorize';
-import moment from 'moment';
-
+import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
+import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 const HEIGHT = Dimensions.get('window').height;
 
 const Untitled = props => {
@@ -33,20 +34,37 @@ const Untitled = props => {
   const [locationAllowed, setLocationAllowed] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
-  const [initialPopup, setInitialPopup] = useState(true);
+  const [initialPopup, setInitialPopup] = useState(false);
   const [secondPopup, setSecondPopup] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
+  const [dataDate, setDataDate] = useState('');
+  const [lastSync, setLastSync] = useState('');
   const toastRef = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
     locationAuthorize();
+    CheckLastSyncAsyncStorage();
+    // console.log(lastSync);
     return () => {
       GoogleFit.unsubscribeListeners();
     };
   }, []);
 
+  const CheckLastSyncAsyncStorage = async () => {
+    const lastSyncDate = await GetLastSyncAsyncStorageFunc();
+    const diff = checkDateDifferenceFunc(
+      moment(lastSyncDate).format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
+    );
+    console.log('mounted: ', lastSyncDate, diff);
+    if (diff <= 1) {
+      return;
+    }
+    setLastSync(lastSyncDate);
+    setInitialPopup(true);
+  };
   const locationAuthorize = async () => {
     const loc_perm = await locationAuthorizeFunc();
     setLocationAllowed(loc_perm);
@@ -110,46 +128,38 @@ const Untitled = props => {
     return true;
   };
 
-  const showToast = (message, type = 'black', duration = 10000) => {
+  const showToast = (message, type = 'black', duration = 3000) => {
     setToastColor(type);
     toastRef.current.show(message, duration);
   };
 
   const testingDates = async () => {
-    // let a = moment('2020-04-03T06:17:23+05:00')
-    //   .format()
-    //   .toString();
-
-    // await AsyncStorage.setItem('LatestUpdate', a, err =>
-    //   console.log('error :', err),
+    // await AsyncStorage.setItem(
+    //   'LatestUpdate',
+    //   moment('2020-04-11T07:59:23').format('YYYY-MM-DD'),
+    //   err => console.log('error :', err),
     // );
-
-    let fetchedDate = '2020-04-11T06:17:23+05:00';
-    // await AsyncStorage.getItem('LatestUpdate', (_err, result) => {
-    //   console.log('result ', result);
-    //   fetchedDate = result;
-    // });
-
-    let diff = moment(moment()).diff(fetchedDate, 'days');
-    if (diff === 0) {
-      return console.log('Already Upto Date');
+    const diff = checkDateDifferenceFunc(
+      moment(lastSync).format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
+    );
+    let updatedDate = moment(lastSync)
+      .add(1, 'days')
+      .format('YYYY-MM-DD');
+    setDataDate(moment(updatedDate).format('DD MMMM YYYY'));
+    for (let i = 0; i < diff - 1; i++) {
+      await publishDataHandler(updatedDate);
+      console.log('done, ', i);
+      updatedDate = moment(updatedDate)
+        .add(1, 'days')
+        .format('YYYY-MM-DD');
+      console.log('updatedDate: ', updatedDate);
+      setDataDate(moment(updatedDate).format('DD MMMM YYYY'));
     }
-    let updatedDate = fetchedDate;
-    for (let i = 0; i < diff; i++) {
-      const abc = await publishDataHandler(updatedDate);
-      console.log('done, ', i), abc;
-      setTimeout(() => {
-        updatedDate = moment(updatedDate)
-          .add(1, 'days')
-          .format();
-        console.log('updatedDate: ', updatedDate);
-      });
-
-      // diff = moment(moment()).diff(updatedDate, 'days');
-      // if (diff === 0) {
-      //   break;
-      // }
-    }
+    setTimeout(() => {
+      setInitialPopup(false);
+      setLastSync(updatedDate);
+    }, 2000);
   };
 
   return (
@@ -157,26 +167,31 @@ const Untitled = props => {
       keyboardVerticalOffset={10}
       behavior="padding"
       style={{flex: 1}}>
-      <Toast
-        ref={toastRef}
-        style={{
-          backgroundColor: toastColor,
-          borderRadius: 10,
-        }}
-      />
       <SafeAreaView>
         {initialPopup ? (
           <Modal style={styles.modal} isVisible={true}>
             {secondPopup ? (
-              <SecondPopup message={progressMessage} progress={progressValue} />
+              <SecondPopup
+                date={dataDate}
+                message={progressMessage}
+                progress={progressValue}
+              />
             ) : (
               <InitialPopup
+                lastSyncDate={lastSync}
                 nextPopup={() => {
                   setSecondPopup(true);
                   testingDates();
                 }}
               />
             )}
+            <Toast
+              ref={toastRef}
+              style={{
+                backgroundColor: toastColor,
+                borderRadius: 10,
+              }}
+            />
           </Modal>
         ) : null}
 
