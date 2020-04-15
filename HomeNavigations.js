@@ -25,8 +25,9 @@ const Drawer = createDrawerNavigator();
 const WIDTH = Dimensions.get('window').width;
 const HomeNavigations = props => {
   const clearUserToken = async () => {
-    await AsyncStorage.multiRemove(['name', 'email', 'uid'], error =>
-      error === null ? null : console.log('clearData error:', error),
+    await AsyncStorage.multiRemove(
+      ['name', 'email', 'uid', 'LatestUpdate'],
+      error => (error === null ? null : console.log('clearData error:', error)),
     );
     props.userToken();
   };

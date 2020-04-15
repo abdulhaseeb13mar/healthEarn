@@ -23,6 +23,8 @@ import {stepsRetrieverFunc} from '../components/stepsRetriever';
 import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
+import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
+
 const HEIGHT = Dimensions.get('window').height;
 
 const Untitled = props => {
@@ -43,14 +45,34 @@ const Untitled = props => {
   useEffect(() => {
     setIsLoading(true);
     locationAuthorize();
-    CheckLastSyncAsyncStorage();
+    CheckLastSyncDate();
     return () => {
       GoogleFit.unsubscribeListeners();
     };
   }, []);
 
-  const CheckLastSyncAsyncStorage = async () => {
-    const lastSyncDate = await GetLastSyncAsyncStorageFunc();
+  const CheckLastSyncDate = async () => {
+    let lastServerSyncDate = await getUserLastSync(props.currentUser.name);
+    console.log(
+      'server date: ',
+      lastServerSyncDate,
+      moment(lastServerSyncDate).format('DD-MM-YYYY'),
+    );
+    let lastSyncDate = await GetLastSyncAsyncStorageFunc();
+    console.log('Async Date: ', lastSyncDate);
+    if (!lastSyncDate) {
+      //this will be true in case of signIn
+      lastSyncDate = lastServerSyncDate;
+    } else if (lastServerSyncDate !== lastSyncDate) {
+      //this will be true incase of any server side problem in date update
+      await setUserLastSync(
+        props.currentUser.uid,
+        props.currentUser.name,
+        lastSyncDate,
+      );
+    }
+
+    console.log('Async Date: ', lastSyncDate);
     const diff = checkDateDifferenceFunc(
       moment(lastSyncDate).format('YYYY-MM-DD'),
       moment().format('YYYY-MM-DD'),
@@ -62,6 +84,7 @@ const Untitled = props => {
     setLastSync(lastSyncDate);
     setInitialPopup(true);
   };
+  //-----------------authorize location--------------------------
   const locationAuthorize = async () => {
     const loc_perm = await locationAuthorizeFunc();
     setLocationAllowed(loc_perm);
@@ -133,7 +156,9 @@ const Untitled = props => {
   const testingDates = async () => {
     // await AsyncStorage.setItem(
     //   'LatestUpdate',
-    //   moment('2020-04-11T07:59:23').format('YYYY-MM-DD'),
+    //   moment('2020-04-12T07:59:23')
+    //     .format('YYYY-MM-DD')
+    //     .valueOf(),
     //   err => console.log('error :', err),
     // );
     const diff = checkDateDifferenceFunc(
@@ -235,6 +260,25 @@ const Untitled = props => {
             <MaterialButtonViolet
               text="Date"
               onPress={testingDates}
+              style={styles.materialButtonViolet}
+            />
+            <MaterialButtonViolet
+              text="set Date"
+              onPress={async () => {
+                await setUserLastSync(
+                  props.currentUser.uid,
+                  props.currentUser.name,
+                  moment('2020-04-12T07:59:23').valueOf(),
+                );
+              }}
+              style={styles.materialButtonViolet}
+            />
+            <MaterialButtonViolet
+              text="get Date"
+              onPress={async () => {
+                const date = await getUserLastSync(props.currentUser.name);
+                console.log(date);
+              }}
               style={styles.materialButtonViolet}
             />
           </View>

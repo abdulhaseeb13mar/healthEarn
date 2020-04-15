@@ -37,7 +37,6 @@ export const checkUsername = async name => {
 export const createUserHealthProfile = async user => {
   try {
     const obj = await api.get('user', {userId: user.uid});
-    console.log(obj);
     const {apiKey} = obj;
     // Assign to user
     const profile = {
@@ -48,6 +47,9 @@ export const createUserHealthProfile = async user => {
       dataTypes: [{id: 'steps', name: 'No Of Steps', unit: ''}],
       price: 100,
       date: moment().format('DD MMMM, YYYY H:mm a'),
+      lastSynced: moment()
+        .subtract(1, 'days')
+        .valueOf(),
       subscribers: [],
     };
 
@@ -68,44 +70,31 @@ export const createUserHealthProfile = async user => {
   }
 };
 
-// export const register = async (name, email, password) => {
-//   let user;
-//   try {
-//     user = await firebase
-//       .auth()
-//       .createUserWithEmailAndPassword(email, password);
-//     // persistLoginInfo(true);
-//     await user.user.updateProfile({
-//       displayName: name,
-//     });
-//     await createUserHealthProfile({...user.user, name});
-//     // await firebase.auth().currentUser.sendEmailVerification();
-//   } catch ({code, message}) {
-//     console.log('exception -> ', {code, message});
-//     return {status: false, message, code};
-//   }
+export const setUserLastSync = async (uId, username, date) => {
+  try {
+    console.log('-----seting user last sync date on firebase-------------');
+    console.log('Server lastsyncdate set is: ', date);
+    const obj = await api.get('user', {userId: uId});
+    const {apiKey} = obj;
+    const packet = {
+      apiKey: apiKey,
+      uid: uId,
+      username: username,
+      lastSynced: date,
+    };
+    console.log(packet);
+    const res = await api.post('setLastSynced', packet);
+    console.log(res);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-//   return {status: true, message: user};
-// };
-
-// export const login = async (email, password) => {
-//   let user;
-
-//   try {
-//     user = await firebase.auth().signInWithEmailAndPassword(email, password);
-//     persistLoginInfo(true);
-//   } catch ({code, message}) {
-//     console.log('exception -> ', {code, message});
-//     return {status: false, message, code};
-//   }
-
-//   return {status: true, message: user};
-// };
-
-// export const onAuthStateChanges = async () => {
-//   await firebase.auth().onAuthStateChanged(user => {
-
-//     return user;
-//   });
-
-// };
+export const getUserLastSync = async name => {
+  console.log('-----geting user last sync date from firebase-------------');
+  const packet = {
+    username: name,
+  };
+  const date = await api.post('getLastSynced', packet);
+  return date.lastSynced;
+};

@@ -11,6 +11,7 @@ import api from '../../../utils/api';
 import CheckIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CancelIcon from 'react-native-vector-icons/MaterialIcons';
 import {SetLastSyncAsyncStorageFunc} from './components/setLastSync(asyncStorage)';
+import {setUserLastSync} from '../../Firebase/index';
 
 const generateRandomKey = length => {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ9';
@@ -66,11 +67,14 @@ export const publishData = async (
     // Save new mamState
     mamState = message.state;
     console.log(message, message.root);
-    // Attach the payload. BTW thats not 80% :D abi toh asal mkam shuru hoga, attaching data to tangle and storing keys on firrebase
+    // Attach the payload.
     await progress(70, 'attaching mam...');
     await faker();
     await Mam.attach(message.payload, message.address, 3, 10);
     await progress(80, 'storing key...');
+    await faker();
+    SetLastSyncAsyncStorageFunc(moment(packet.time).format());
+    await setUserLastSync(userId, username, packet.time);
     await faker();
     await storeKeysOnFirebase(
       secretKey,
@@ -82,8 +86,6 @@ export const publishData = async (
       },
       showToast,
     );
-    SetLastSyncAsyncStorageFunc(moment(packet.time).format());
-    await faker();
     await progress(100, 'Sent!');
     await faker();
     console.log('Data published');
