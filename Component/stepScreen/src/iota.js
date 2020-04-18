@@ -33,7 +33,6 @@ export const publishData = async (
   userId,
   username,
   packet,
-  loadingHandler,
   showToast,
   progress,
 ) => {
@@ -95,8 +94,6 @@ export const publishData = async (
       toastGenerator('Error occured while publishing data to tangle', false),
       'red',
     );
-  } finally {
-    loadingHandler(false);
   }
 };
 
