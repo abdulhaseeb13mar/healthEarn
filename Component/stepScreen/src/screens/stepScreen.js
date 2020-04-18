@@ -32,7 +32,7 @@ const Untitled = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
-  const [isPublishing, setIsPublishing] = useState(false);
+  // const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
   const [initialPopup, setInitialPopup] = useState(false);
   const [secondPopup, setSecondPopup] = useState(false);
@@ -63,7 +63,7 @@ const Untitled = props => {
     if (!lastSyncDate) {
       //this will be true in case of signIn
       lastSyncDate = lastServerSyncDate;
-    } else if (lastServerSyncDate !== lastSyncDate) {
+    } else if (lastServerSyncDate !== moment(lastSyncDate).valueOf()) {
       //this will be true incase of any server side problem in date update
       await setUserLastSync(
         props.currentUser.uid,
@@ -109,7 +109,6 @@ const Untitled = props => {
   };
 
   const publishDataHandler = async date => {
-    setIsPublishing(true);
     const steps = await stepsRetrieverFunc({
       startDate: new Date(
         moment(date)
@@ -156,7 +155,7 @@ const Untitled = props => {
   const testingDates = async () => {
     // await AsyncStorage.setItem(
     //   'LatestUpdate',
-    //   moment('2020-04-12T07:59:23')
+    //   moment('2020-04-15T07:59:23')
     //     .format('YYYY-MM-DD')
     //     .valueOf(),
     //   err => console.log('error :', err),
@@ -229,6 +228,7 @@ const Untitled = props => {
                   <AnimateNumber
                     value={count}
                     interval={14}
+                    // eslint-disable-next-line no-shadow
                     timing={(interval, progress) => {
                       return interval * (1 - Math.sin(Math.PI * progress)) * 10;
                     }}
@@ -251,36 +251,17 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            <MaterialButtonViolet
+            {/* <MaterialButtonViolet
               text="Send Data"
               onPress={publishDataHandler}
               style={styles.materialButtonViolet}
               isDisabled={isPublishing}
-            />
-            <MaterialButtonViolet
+            /> */}
+            {/* <MaterialButtonViolet
               text="Date"
               onPress={testingDates}
               style={styles.materialButtonViolet}
-            />
-            <MaterialButtonViolet
-              text="set Date"
-              onPress={async () => {
-                await setUserLastSync(
-                  props.currentUser.uid,
-                  props.currentUser.name,
-                  moment('2020-04-12T07:59:23').valueOf(),
-                );
-              }}
-              style={styles.materialButtonViolet}
-            />
-            <MaterialButtonViolet
-              text="get Date"
-              onPress={async () => {
-                const date = await getUserLastSync(props.currentUser.name);
-                console.log(date);
-              }}
-              style={styles.materialButtonViolet}
-            />
+            /> */}
           </View>
         </View>
         <View>
@@ -352,6 +333,7 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0,0,0,1)',
     marginTop: 15,
     alignSelf: 'center',
+    elevation: 13,
   },
   popup: {
     position: 'absolute',
