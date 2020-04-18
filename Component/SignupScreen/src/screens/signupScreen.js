@@ -9,9 +9,10 @@ import {
   ScrollView,
   AsyncStorage,
 } from 'react-native';
+import moment from 'moment';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
-// import firebase from '../../../../firebase';
+
 import {
   checkUsername,
   register,
@@ -59,11 +60,16 @@ const Untitled1 = props => {
           setPasswordErrMsg('');
           setUsernameErrMsg('');
           await AsyncStorage.multiSet(
-            // eslint-disable-next-line prettier/prettier
             [
               ['name', username],
               ['email', email],
               ['uid', response.user.uid],
+              [
+                'LatestUpdate',
+                moment()
+                  .subtract(1, 'days')
+                  .format('YYYY-MM-DD'),
+              ],
             ],
             error => {
               error ? console.log('setData error:', error) : null;
@@ -71,8 +77,8 @@ const Untitled1 = props => {
           );
           console.log(response.user.uid);
           // Wait at least 5 seconds so that users collection is updated in firestore
-          setTimeout(() => {
-            createUserHealthProfile({
+          setTimeout(async () => {
+            await createUserHealthProfile({
               uid: response.user.uid,
               name: username,
             });

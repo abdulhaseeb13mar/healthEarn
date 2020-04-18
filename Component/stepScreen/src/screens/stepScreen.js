@@ -1,26 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable no-unused-vars */
 import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
   View,
   Text,
-  PermissionsAndroid,
   SafeAreaView,
   KeyboardAvoidingView,
-  AsyncStorage,
   Dimensions,
   Button,
-  Alert,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
-import AnimateNumber from 'react-native-countup';
 import moment from 'moment';
-import MaterialButtonViolet from '../components/MaterialButtonViolet';
+import AnimateNumber from 'react-native-countup';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-easy-toast';
-import localScopes from '../../../../scopes';
+import MaterialButtonViolet from '../components/MaterialButtonViolet';
 import {publishData} from '../iota';
+import {InitialPopup} from '../components/initialPopup';
+import {SecondPopup} from '../components/secondPopup';
+import {stepsRetrieverFunc} from '../components/stepsRetriever';
+import {locationAuthorizeFunc} from '../components/locationAuthorize';
+import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
+import {checkDateDifferenceFunc} from '../components/DifferenceDates';
+import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -29,120 +32,155 @@ const Untitled = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
-  const [isPublishing, setIsPublishing] = useState(false);
-
+  // const [isPublishing, setIsPublishing] = useState(false);
+  const [toastColor, setToastColor] = useState('black');
+  const [initialPopup, setInitialPopup] = useState(false);
+  const [secondPopup, setSecondPopup] = useState(false);
+  const [progressValue, setProgressValue] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
+  const [dataDate, setDataDate] = useState('');
+  const [lastSync, setLastSync] = useState('');
   const toastRef = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
     locationAuthorize();
+    CheckLastSyncDate();
     return () => {
       GoogleFit.unsubscribeListeners();
     };
   }, []);
 
+  const CheckLastSyncDate = async () => {
+    let lastServerSyncDate = await getUserLastSync(props.currentUser.name);
+    console.log(
+      'server date: ',
+      lastServerSyncDate,
+      moment(lastServerSyncDate).format('DD-MM-YYYY'),
+    );
+    let lastSyncDate = await GetLastSyncAsyncStorageFunc();
+    console.log('Async Date: ', lastSyncDate);
+    if (!lastSyncDate) {
+      //this will be true in case of signIn
+      lastSyncDate = lastServerSyncDate;
+    } else if (lastServerSyncDate !== moment(lastSyncDate).valueOf()) {
+      //this will be true incase of any server side problem in date update
+      await setUserLastSync(
+        props.currentUser.uid,
+        props.currentUser.name,
+        lastSyncDate,
+      );
+    }
+
+    console.log('Async Date: ', lastSyncDate);
+    const diff = checkDateDifferenceFunc(
+      moment(lastSyncDate).format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
+    );
+    console.log('mounted: ', lastSyncDate, diff);
+    if (diff <= 1) {
+      return;
+    }
+    setLastSync(lastSyncDate);
+    setInitialPopup(true);
+  };
+  //-----------------authorize location--------------------------
   const locationAuthorize = async () => {
-    const options = {
-      scopes: [
-        localScopes.FITNESS_ACTIVITY_READ_WRITE,
-        localScopes.FITNESS_BODY_READ_WRITE,
-      ],
-    };
-    await GoogleFit.authorize(options)
-      .then(async authResult => {
-        if (authResult.success) {
-          let loc_perm = await requestLocationPermission();
-          if (loc_perm) {
-            GoogleFit.startRecording(x => {
-              console.log(x);
-            });
-          }
-        } else {
-          return Alert.alert(
-            'Alert!',
-            'Please Select your account for Google Fit',
-            [{text: 'OK', onPress: () => locationAuthorize()}],
-            {cancelable: false},
-          );
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    const loc_perm = await locationAuthorizeFunc();
+    setLocationAllowed(loc_perm);
     stepsRetriever();
   };
 
-  const requestLocationPermission = async () => {
-    try {
-      const fineGranted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (fineGranted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the fine location');
-        setLocationAllowed(true);
-        return true;
-      } else {
-        console.log('Location permission denied');
-        setLocationAllowed(false);
-        return false;
-      }
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  };
-
   //--------------------retrieve steps----------------------------
-  const stepsRetriever = () => {
-    const retrieveOptions = {
-      // startDate: new Date(
-      //   moment()
-      //     .subtract(1, 'day')
-      //     .format('YYYY-MM-DD'),
-      // ).toISOString(),
-      //startDate: '2019-02-01T00:00:17.971Z',
+  const stepsRetriever = async () => {
+    const steps = await stepsRetrieverFunc({
       startDate: new Date(
-        moment().format('YYYY-MM-DD' + 'T' + '00:00:00' + 'Z'),
+        moment()
+          .startOf('day')
+          .format(),
       ).toISOString(),
       endDate: new Date().toISOString(),
-    };
-
-    GoogleFit.getDailyStepCountSamples(retrieveOptions)
-      .then(res => {
-        for (let i = 0; i < res.length; i++) {
-          if (res[i].source === 'com.google.android.gms:estimated_steps') {
-            res[i].steps.length !== 0
-              ? setCount(res[i].steps[0].value)
-              : setCount(0);
-            setTimeout(() => {
-              setIsDisabledRefreshBtn(false);
-            }, 3500);
-            setIsLoading(false);
-            break;
-          }
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    });
+    setCount(steps);
+    setTimeout(() => {
+      setIsDisabledRefreshBtn(false);
+    }, 3500);
+    setIsLoading(false);
   };
 
-  const publishDataHandler = () => {
-    setIsPublishing(true);
-    const time = Date.now();
+  const publishDataHandler = async date => {
+    const steps = await stepsRetrieverFunc({
+      startDate: new Date(
+        moment(date)
+          .startOf('day')
+          .format(),
+      ).toISOString(),
+      endDate: new Date(
+        moment(date)
+          .endOf('day')
+          .format(),
+      ).toISOString(),
+    });
+    console.log(date, steps);
+    const time = moment(date).valueOf();
     const {name, uid} = props.currentUser;
 
     // More fields in future would be added here after its structure being pushed
     // in devices -> sesnorId -> dataTypes
     const packet = {
-      'No of Steps': count,
+      'No of Steps': steps,
     };
 
-    publishData(uid, name, {time, data: packet}, setIsPublishing, showToast);
+    await publishData(
+      uid,
+      name,
+      {time, data: packet},
+      setIsPublishing,
+      showToast,
+      progress,
+    );
   };
 
-  const showToast = (message, duration = 3000) => {
+  const progress = (value, message) => {
+    setProgressValue(value);
+    setProgressMessage(message);
+    return true;
+  };
+
+  const showToast = (message, type = 'black', duration = 3000) => {
+    setToastColor(type);
     toastRef.current.show(message, duration);
+  };
+
+  const testingDates = async () => {
+    // await AsyncStorage.setItem(
+    //   'LatestUpdate',
+    //   moment('2020-04-15T07:59:23')
+    //     .format('YYYY-MM-DD')
+    //     .valueOf(),
+    //   err => console.log('error :', err),
+    // );
+    const diff = checkDateDifferenceFunc(
+      moment(lastSync).format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
+    );
+    let updatedDate = moment(lastSync)
+      .add(1, 'days')
+      .format('YYYY-MM-DD');
+    setDataDate(moment(updatedDate).format('DD MMMM YYYY'));
+    for (let i = 0; i < diff - 1; i++) {
+      await publishDataHandler(updatedDate);
+      console.log('done, ', i);
+      updatedDate = moment(updatedDate)
+        .add(1, 'days')
+        .format('YYYY-MM-DD');
+      console.log('updatedDate: ', updatedDate);
+      setDataDate(moment(updatedDate).format('DD MMMM YYYY'));
+    }
+    setTimeout(() => {
+      setInitialPopup(false);
+      setLastSync(updatedDate);
+    }, 2000);
   };
 
   return (
@@ -150,14 +188,34 @@ const Untitled = props => {
       keyboardVerticalOffset={10}
       behavior="padding"
       style={{flex: 1}}>
-      <Toast
-        ref={toastRef}
-        style={{
-          backgroundColor: '#3F51B5',
-          borderRadius: 10,
-        }}
-      />
       <SafeAreaView>
+        {initialPopup ? (
+          <Modal style={styles.modal} isVisible={true}>
+            {secondPopup ? (
+              <SecondPopup
+                date={dataDate}
+                message={progressMessage}
+                progress={progressValue}
+              />
+            ) : (
+              <InitialPopup
+                lastSyncDate={lastSync}
+                nextPopup={() => {
+                  setSecondPopup(true);
+                  testingDates();
+                }}
+              />
+            )}
+            <Toast
+              ref={toastRef}
+              style={{
+                backgroundColor: toastColor,
+                borderRadius: 10,
+              }}
+            />
+          </Modal>
+        ) : null}
+
         <View style={styles.container}>
           <View style={styles.innerContainer}>
             <Text style={styles.UpperLine}>Hello {props.currentUser.name}</Text>
@@ -170,6 +228,7 @@ const Untitled = props => {
                   <AnimateNumber
                     value={count}
                     interval={14}
+                    // eslint-disable-next-line no-shadow
                     timing={(interval, progress) => {
                       return interval * (1 - Math.sin(Math.PI * progress)) * 10;
                     }}
@@ -192,12 +251,17 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            <MaterialButtonViolet
+            {/* <MaterialButtonViolet
               text="Send Data"
               onPress={publishDataHandler}
               style={styles.materialButtonViolet}
               isDisabled={isPublishing}
-            />
+            /> */}
+            {/* <MaterialButtonViolet
+              text="Date"
+              onPress={testingDates}
+              style={styles.materialButtonViolet}
+            /> */}
           </View>
         </View>
         <View>
@@ -227,6 +291,11 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     marginTop: 50,
+  },
+  modal: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   stepsLine: {
     justifyContent: 'space-between',
@@ -264,6 +333,7 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0,0,0,1)',
     marginTop: 15,
     alignSelf: 'center',
+    elevation: 13,
   },
   popup: {
     position: 'absolute',

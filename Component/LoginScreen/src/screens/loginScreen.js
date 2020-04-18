@@ -24,7 +24,7 @@ const Untitled1 = props => {
     firebase
       .auth()
       .signInWithEmailAndPassword(username.trim(), password)
-      .then(signedInUser => {
+      .then(async signedInUser => {
         setUsernameErrMsg('');
         setPasswordErrMsg('');
         AsyncStorage.multiSet(
@@ -51,6 +51,7 @@ const Untitled1 = props => {
         }
       });
   };
+
   return (
     <KeyboardAvoidingView behavior="height">
       <ScrollView keyboardShouldPersistTaps="handled">

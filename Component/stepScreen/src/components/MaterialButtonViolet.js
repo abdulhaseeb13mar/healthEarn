@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React from 'react';
 import {StyleSheet, TouchableOpacity, Text} from 'react-native';
 
 function MaterialButtonViolet(props) {
