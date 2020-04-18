@@ -32,7 +32,6 @@ const Untitled = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabledRefreshBtn, setIsDisabledRefreshBtn] = useState(false);
   const [locationAllowed, setLocationAllowed] = useState(true);
-  // const [isPublishing, setIsPublishing] = useState(false);
   const [toastColor, setToastColor] = useState('black');
   const [initialPopup, setInitialPopup] = useState(false);
   const [secondPopup, setSecondPopup] = useState(false);
@@ -131,14 +130,7 @@ const Untitled = props => {
       'No of Steps': steps,
     };
 
-    await publishData(
-      uid,
-      name,
-      {time, data: packet},
-      setIsPublishing,
-      showToast,
-      progress,
-    );
+    await publishData(uid, name, {time, data: packet}, showToast, progress);
   };
 
   const progress = (value, message) => {
