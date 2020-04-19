@@ -94,7 +94,7 @@ const Untitled1 = props => {
             isLoading={loading}
           />
           <Text style={styles.alreadyText}>
-            Don't have an account?
+            Don't have an account?{' '}
             <Text
               onPress={() => {
                 props.navigation.navigate('Signup');
