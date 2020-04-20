@@ -24,6 +24,7 @@ import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
+import {LocalNotification} from '../../../../Notifications/LocalPushNotification';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -250,12 +251,11 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            {/* <MaterialButtonViolet
-              text="Send Data"
-              onPress={publishDataHandler}
+            <MaterialButtonViolet
+              text="Send Notification"
+              onPress={() => LocalNotification()}
               style={styles.materialButtonViolet}
-              isDisabled={isPublishing}
-            /> */}
+            />
             {/* <MaterialButtonViolet
               text="Date"
               onPress={testingDates}
