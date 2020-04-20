@@ -24,7 +24,10 @@ import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
-import {LocalNotification} from '../../../../Notifications/LocalPushNotification';
+import {
+  LocalNotification,
+  LocalNotificationSchedule,
+} from '../../../../Notifications/LocalPushNotification';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -176,6 +179,24 @@ const Untitled = props => {
     }, 2000);
   };
 
+  // const abc = () => {
+  //   console.log(
+  //     new Date(
+  //       moment()
+  //         .startOf('date')
+  //         .valueOf(),
+  //     ),
+  //   );
+  //   console.log(
+  //     new Date(
+  //       moment()
+  //         .startOf('date')
+  //         .valueOf() +
+  //         86400 * 1000,
+  //     ),
+  //   );
+  // };
+
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={10}
@@ -256,11 +277,11 @@ const Untitled = props => {
               onPress={() => LocalNotification()}
               style={styles.materialButtonViolet}
             />
-            {/* <MaterialButtonViolet
+            <MaterialButtonViolet
               text="Date"
-              onPress={testingDates}
+              onPress={() => abc()}
               style={styles.materialButtonViolet}
-            /> */}
+            />
           </View>
         </View>
 
