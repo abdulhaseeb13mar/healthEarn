@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Button,
+  AsyncStorage,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import moment from 'moment';
@@ -151,7 +152,7 @@ const Untitled = props => {
   const testingDates = async () => {
     // await AsyncStorage.setItem(
     //   'LatestUpdate',
-    //   moment('2020-04-15T07:59:23')
+    //   moment('2020-04-18T07:59:23')
     //     .format('YYYY-MM-DD')
     //     .valueOf(),
     //   err => console.log('error :', err),
@@ -274,12 +275,12 @@ const Untitled = props => {
             />
             <MaterialButtonViolet
               text="Send Notification"
-              onPress={() => LocalNotification()}
+              onPress={() => LocalNotificationSchedule()}
               style={styles.materialButtonViolet}
             />
             <MaterialButtonViolet
               text="Date"
-              onPress={() => abc()}
+              onPress={() => testingDates()}
               style={styles.materialButtonViolet}
             />
           </View>

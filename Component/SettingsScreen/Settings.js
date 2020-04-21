@@ -1,24 +1,22 @@
-/* eslint-disable no-unused-vars */
-import React, {useState, useEffect} from 'react';
-import {SafeAreaView, StyleSheet, ScrollView, View, Text} from 'react-native';
-const Settings = () => {
-  return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={styles.container}>
-          <Text>This is Settings screen</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+import React from 'react';
+import {createStackNavigator} from '@react-navigation/stack';
+import ResetPassword from './Screens/ResetPassword';
+import HomeSettings from './Screens/HomeSettings';
+const Stack = createStackNavigator();
+const Settings = props => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: {backgroundColor: '#3F51B5'},
+      headerTintColor: 'white',
+      headerTitleAlign: 'center',
+    }}>
+    <Stack.Screen
+      name="HomeSettings"
+      component={HomeSettings}
+      options={{headerTitle: 'Settings'}}
+    />
+    <Stack.Screen name="ResetPassword" component={ResetPassword} />
+  </Stack.Navigator>
+);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 export default Settings;

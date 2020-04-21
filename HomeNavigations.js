@@ -64,9 +64,10 @@ const HomeNavigations = props => {
         }}>
         <Drawer.Screen
           name="Home"
+          // DrawerNavigationOptions
           options={{
             drawerIcon: () => <Icon name="home" size={27} />,
-            unmountOnBlur: true,
+            unmountOnBlur: false,
           }}>
           {homeProps => (
             <StepScreen
@@ -109,7 +110,7 @@ const HomeNavigations = props => {
           options={{
             drawerIcon: () => <Icon name="settings" size={27} />,
             unmountOnBlur: true,
-            gestureEnabled: true,
+            gestureEnabled: false,
           }}>
           {settingsProps => (
             <SettingScreen
