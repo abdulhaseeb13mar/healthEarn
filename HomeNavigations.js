@@ -114,6 +114,7 @@ const HomeNavigations = props => {
           }}>
           {settingsProps => (
             <SettingScreen
+              currentUser={props.currentUser}
               {...settingsProps}
               userToken={() => props.userToken()}
             />
