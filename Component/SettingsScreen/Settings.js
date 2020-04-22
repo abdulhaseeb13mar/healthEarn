@@ -4,7 +4,6 @@ import ResetPassword from './Screens/ResetPassword';
 import HomeSettings from './Screens/HomeSettings';
 const Stack = createStackNavigator();
 const Settings = props => {
-  // console.log(props);
   return (
     <Stack.Navigator
       screenOptions={{

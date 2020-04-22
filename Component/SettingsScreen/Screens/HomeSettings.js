@@ -9,9 +9,6 @@ const HomeSettings = props => {
         iconName="lock-reset"
         text="Change Password"
       />
-      <SettingsOptions iconName="lock-reset" text="Change Password" />
-      <SettingsOptions iconName="lock-reset" text="Change Password" />
-      <SettingsOptions iconName="lock-reset" text="Change Password" />
     </View>
   );
 };

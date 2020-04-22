@@ -14,12 +14,7 @@ const SettingsOptions = props => (
     </View>
   </TouchableOpacity>
 );
-// --------style constants-----------
-// const borders = {
-//   borderWidth: 1,
-//   borderStyle: 'solid',
-//     borderColor: 'red',
-// };
+
 const height = '12%';
 const ThemeColor = '#3F51B5';
 

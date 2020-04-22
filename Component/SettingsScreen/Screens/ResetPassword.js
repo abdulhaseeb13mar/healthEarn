@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
+import {View, StyleSheet, Alert} from 'react-native';
 import MaterialMessageTextbox from '../../LoginScreen/src/components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../../LoginScreen/src/components/MaterialButtonViolet';
 import firebase from '../../../firebase';
@@ -124,19 +124,12 @@ const ResetPassword = props => {
   );
 };
 
-// const borders = {
-//   borderWidth: 1,
-//   borderStyle: 'solid',
-//   borderColor: 'red',
-// };
 const styles = StyleSheet.create({
   container: {
-    // ...borders,
     flex: 1,
     alignItems: 'center',
   },
   PasswordsInput: {
-    // ...borders,
     width: '80%',
     height: '20%',
     shadowOffset: {
