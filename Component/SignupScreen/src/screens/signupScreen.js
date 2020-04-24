@@ -12,6 +12,7 @@ import {
 import moment from 'moment';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
+import {LocalNotificationSchedule} from '../../../../Notifications/LocalPushNotification';
 
 import {
   checkUsername,
@@ -83,6 +84,7 @@ const Untitled1 = props => {
               name: username,
             });
           }, 5000);
+          LocalNotificationSchedule();
           props.userToken();
         } else {
           setLoading(false);
