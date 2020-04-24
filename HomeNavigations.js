@@ -15,10 +15,11 @@ import {
   Image,
   ImageBackground,
 } from 'react-native';
+import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
+// import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
 import SettingScreen from './Component/SettingsScreen/Settings';
-import WalletScreen from './Component/WalletScreen/Wallet';
+// import WalletScreen from './Component/WalletScreen/Wallet';
 import StepScreen from './Component/stepScreen/src/screens/stepScreen';
 
 const Drawer = createDrawerNavigator();
@@ -42,7 +43,10 @@ const HomeNavigations = props => {
         }}
         drawerContent={drawerComponentProps => (
           <CustomNavigator
-            signout={() => clearUserToken()}
+            signout={() => {
+              clearUserToken();
+              PushNotification.cancelAllLocalNotifications();
+            }}
             currentUser={props.currentUser}
             {...drawerComponentProps}
           />
@@ -64,9 +68,10 @@ const HomeNavigations = props => {
         }}>
         <Drawer.Screen
           name="Home"
+          // DrawerNavigationOptions
           options={{
             drawerIcon: () => <Icon name="home" size={27} />,
-            unmountOnBlur: true,
+            unmountOnBlur: false,
           }}>
           {homeProps => (
             <StepScreen
@@ -76,7 +81,7 @@ const HomeNavigations = props => {
             />
           )}
         </Drawer.Screen>
-        <Drawer.Screen
+        {/* <Drawer.Screen
           name="HeartRate"
           options={{
             drawerIcon: () => <Icon name="heart" size={27} />,
@@ -103,16 +108,17 @@ const HomeNavigations = props => {
               userToken={() => props.userToken()}
             />
           )}
-        </Drawer.Screen>
+        </Drawer.Screen> */}
         <Drawer.Screen
           name="Settings"
           options={{
             drawerIcon: () => <Icon name="settings" size={27} />,
             unmountOnBlur: true,
-            gestureEnabled: true,
+            gestureEnabled: false,
           }}>
           {settingsProps => (
             <SettingScreen
+              currentUser={props.currentUser}
               {...settingsProps}
               userToken={() => props.userToken()}
             />
@@ -123,20 +129,39 @@ const HomeNavigations = props => {
   );
 };
 
+const AvatarTextHandler = name => {
+  if (name.includes(' ')) {
+    let res = name.split(' ');
+    return (
+      name.substring(0, 1).toUpperCase() + res[1].substring(0, 1).toUpperCase()
+    );
+  }
+  return name.substring(0, 1);
+};
+
 const CustomNavigator = props => {
   return (
     <DrawerContentScrollView {...props}>
       <ImageBackground
         source={require('./Component/stepScreen/src/assets/images/drawerback.jpg')}
         style={styles.header}>
-        <Image
+        {/* <Image
           source={require('./Component/stepScreen/src/assets/images/blankProfile.png')}
           resizeMode="contain"
           style={styles.image}
-        />
+        /> */}
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatarText}>
+            {AvatarTextHandler(props.currentUser.name)}
+          </Text>
+        </View>
         <View style={styles.textContainer}>
-          <Text style={styles.headerName}>{props.currentUser.name}</Text>
-          <Text style={styles.headerEmail}>{props.currentUser.email}</Text>
+          <Text numberOfLines={1} style={styles.headerName}>
+            {props.currentUser.name}
+          </Text>
+          <Text numberOfLines={1} style={styles.headerEmail}>
+            {props.currentUser.email}
+          </Text>
         </View>
       </ImageBackground>
       <DrawerItemList {...props} />
@@ -185,13 +210,13 @@ const styles = StyleSheet.create({
   },
   headerName: {
     color: 'white',
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: 'bold',
     backgroundColor: 'black',
   },
   headerEmail: {
     color: 'white',
-    fontSize: 15,
+    fontSize: 14,
     backgroundColor: 'black',
   },
   image: {
@@ -199,6 +224,24 @@ const styles = StyleSheet.create({
     width: '25%',
     height: 100,
     borderRadius: 200,
+  },
+  avatarContainer: {
+    marginLeft: '4%',
+    // height: '35%',
+    width: '25%',
+    aspectRatio: 1,
+    backgroundColor: '#3F51B5',
+    borderRadius: 50,
+  },
+  avatarText: {
+    color: 'white',
+    fontSize: 36,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    // borderColor: 'red',
+    // borderStyle: 'solid',
+    // borderWidth: 1,
+    height: '100%',
   },
 });
 

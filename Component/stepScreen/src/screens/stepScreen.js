@@ -147,7 +147,7 @@ const Untitled = props => {
   const testingDates = async () => {
     // await AsyncStorage.setItem(
     //   'LatestUpdate',
-    //   moment('2020-04-15T07:59:23')
+    //   moment('2020-04-18T07:59:23')
     //     .format('YYYY-MM-DD')
     //     .valueOf(),
     //   err => console.log('error :', err),
@@ -207,7 +207,14 @@ const Untitled = props => {
             />
           </Modal>
         ) : null}
-
+        <View style={styles.hamburger}>
+          <Icon
+            name="menu"
+            size={45}
+            color="#3F51B5"
+            onPress={() => props.navigation.openDrawer()}
+          />
+        </View>
         <View style={styles.container}>
           <View style={styles.innerContainer}>
             <Text style={styles.UpperLine}>Hello {props.currentUser.name}</Text>
@@ -244,25 +251,18 @@ const Untitled = props => {
               style={styles.materialButtonViolet}
             />
             {/* <MaterialButtonViolet
-              text="Send Data"
-              onPress={publishDataHandler}
+              text="Send Notification"
+              onPress={() => LocalNotificationSchedule()}
               style={styles.materialButtonViolet}
-              isDisabled={isPublishing}
-            /> */}
-            {/* <MaterialButtonViolet
+            />
+            <MaterialButtonViolet
               text="Date"
-              onPress={testingDates}
+              onPress={() => testingDates()}
               style={styles.materialButtonViolet}
             /> */}
           </View>
         </View>
-        <View>
-          <Icon
-            name="menu"
-            size={40}
-            onPress={() => props.navigation.openDrawer()}
-          />
-        </View>
+
         {locationAllowed ? null : (
           <View style={styles.popup}>
             <Text style={styles.popupText}>
@@ -280,6 +280,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
+    marginTop: '5%',
+    // borderColor: 'red',
+    // borderStyle: 'solid',
+    // borderWidth: 1,
   },
   innerContainer: {
     marginTop: 50,
@@ -344,6 +348,10 @@ const styles = StyleSheet.create({
   popupText: {
     color: 'white',
     fontSize: 14,
+  },
+  hamburger: {
+    marginLeft: '5%',
+    marginTop: '3%',
   },
 });
 

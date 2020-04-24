@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 17,
     lineHeight: 30,
+    textAlign: 'center',
   },
   materialButtonViolet: {
     height: '100%',
