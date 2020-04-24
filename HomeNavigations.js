@@ -15,6 +15,7 @@ import {
   Image,
   ImageBackground,
 } from 'react-native';
+import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
 import SettingScreen from './Component/SettingsScreen/Settings';
@@ -42,7 +43,10 @@ const HomeNavigations = props => {
         }}
         drawerContent={drawerComponentProps => (
           <CustomNavigator
-            signout={() => clearUserToken()}
+            signout={() => {
+              clearUserToken();
+              PushNotification.cancelAllLocalNotifications();
+            }}
             currentUser={props.currentUser}
             {...drawerComponentProps}
           />

@@ -12,6 +12,7 @@ import {
 import firebase from '../../../../firebase';
 import MaterialMessageTextbox from '../components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../components/MaterialButtonViolet';
+import {LocalNotificationSchedule} from '../../../../Notifications/LocalPushNotification';
 
 const Untitled1 = props => {
   const [username, setUsername] = useState('');
@@ -35,6 +36,7 @@ const Untitled1 = props => {
           ],
           error => console.log('setData error:', error),
         );
+        LocalNotificationSchedule();
         props.userToken();
       })
       .catch(err => {

@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Button,
-  AsyncStorage,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import moment from 'moment';
@@ -25,10 +24,6 @@ import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
-import {
-  LocalNotification,
-  LocalNotificationSchedule,
-} from '../../../../Notifications/LocalPushNotification';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -180,24 +175,6 @@ const Untitled = props => {
     }, 2000);
   };
 
-  // const abc = () => {
-  //   console.log(
-  //     new Date(
-  //       moment()
-  //         .startOf('date')
-  //         .valueOf(),
-  //     ),
-  //   );
-  //   console.log(
-  //     new Date(
-  //       moment()
-  //         .startOf('date')
-  //         .valueOf() +
-  //         86400 * 1000,
-  //     ),
-  //   );
-  // };
-
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={10}
@@ -273,7 +250,7 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            <MaterialButtonViolet
+            {/* <MaterialButtonViolet
               text="Send Notification"
               onPress={() => LocalNotificationSchedule()}
               style={styles.materialButtonViolet}
@@ -282,7 +259,7 @@ const Untitled = props => {
               text="Date"
               onPress={() => testingDates()}
               style={styles.materialButtonViolet}
-            />
+            /> */}
           </View>
         </View>
 
