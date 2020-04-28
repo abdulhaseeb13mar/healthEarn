@@ -1,7 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import ResetPassword from './Screens/ResetPassword';
-import HomeSettings from './Screens/HomeSettings';
+import ResetPassword from '../ChangePassScreen/Screens/ResetPassword';
+// import HomeSettings from './Screens/HomeSettings';
 const Stack = createStackNavigator();
 const Settings = props => {
   return (
@@ -11,15 +11,16 @@ const Settings = props => {
         headerTintColor: 'white',
         headerTitleAlign: 'center',
       }}>
-      <Stack.Screen
+      {/* <Stack.Screen
         currentUser={props.currentUser}
         name="HomeSettings"
         component={HomeSettings}
         options={{headerTitle: 'Settings'}}
-      />
+      /> */}
       <Stack.Screen
         initialParams={props.currentUser}
-        name="ResetPassword"
+        name="ChangePassword"
+        options={{headerTitle: 'Change Password'}}
         component={ResetPassword}
       />
     </Stack.Navigator>

@@ -41,7 +41,7 @@ export const publishData = async (
     let message;
     let mamKey;
     let res;
-    await progress(0, 'awaiting for api...');
+    await progress(0, 'Initializing...');
     await faker();
     res = await api.get('getSk', {userId, username});
     if (!res) {
@@ -51,7 +51,7 @@ export const publishData = async (
     secretKey = sk;
     // Initialise MAM State
     let mamState = Mam.init(iotaConfig.provider);
-    await progress(20, 'Generating Key...');
+    await progress(20, 'Preparing data packet...');
     await faker();
     // Change MAM encryption key on each loop
     mamKey = generateRandomKey(81);
@@ -60,17 +60,17 @@ export const publishData = async (
     // Create Trytes
     const trytes = asciiToTrytes(JSON.stringify(packet));
     // Get MAM payload
-    await progress(30, 'Creating Message...');
+    await progress(30, 'Preparing data packet...');
     await faker();
     message = Mam.create(mamState, trytes);
     // Save new mamState
     mamState = message.state;
     console.log(message, message.root);
     // Attach the payload.
-    await progress(70, 'attaching mam...');
+    await progress(70, 'Publishing data packet...');
     await faker();
     await Mam.attach(message.payload, message.address, 3, 10);
-    await progress(80, 'storing key...');
+    await progress(80, 'Backing up keys...');
     await faker();
     SetLastSyncAsyncStorageFunc(moment(packet.time).format());
     await setUserLastSync(userId, username, packet.time);
@@ -85,13 +85,13 @@ export const publishData = async (
       },
       showToast,
     );
-    await progress(100, 'Sent!');
+    await progress(100, 'Done!');
     await faker();
     console.log('Data published');
   } catch (e) {
     console.log('error', e);
     showToast(
-      toastGenerator('Error occured while publishing data to tangle', false),
+      ToastGenerator('Error occured while publishing data to tangle', false),
       'red',
     );
   }
@@ -107,7 +107,7 @@ const storeKeysOnFirebase = async (sk, username, packet, showToast) => {
     });
     console.log('saved in firebase');
     showToast(
-      toastGenerator(
+      ToastGenerator(
         'Data published successfully for ' +
           moment(packet.time).format('DD-MM-YY'),
         true,
@@ -116,13 +116,13 @@ const storeKeysOnFirebase = async (sk, username, packet, showToast) => {
   } catch (e) {
     console.log(e);
     showToast(
-      toastGenerator('Error occured while storing keys to firestore', false),
+      ToastGenerator('Error occured while storing keys to firestore', false),
       'red',
     );
   }
 };
 
-const toastGenerator = (message, success) => {
+export const ToastGenerator = (message, success) => {
   return (
     <Text>
       {' '}

@@ -1,8 +1,13 @@
-import React, {useState} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Alert} from 'react-native';
 import MaterialMessageTextbox from '../../LoginScreen/src/components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../../LoginScreen/src/components/MaterialButtonViolet';
 import firebase from '../../../firebase';
+import Toast from 'react-native-easy-toast';
+import Modal from 'react-native-modal';
+import {ToastGenerator} from '../../stepScreen/src/iota';
+
 const ResetPassword = props => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -11,6 +16,10 @@ const ResetPassword = props => {
   const [newPasswordErrMsg, setNewPasswordErrMsg] = useState('');
   const [newPasswordAgainErrMsg, setNewPasswordAgainErrMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [toastColor, setToastColor] = useState('black');
+  const [modalState, setModalState] = useState(false);
+  const toastRef = useRef(null);
+
   const changePassword = async () => {
     setLoading(true);
     const inputCheck = PasswordsChecker();
@@ -18,30 +27,42 @@ const ResetPassword = props => {
       setLoading(false);
       return;
     }
-    const user = await firebase.auth().currentUser;
-    const cred = await firebase.auth.EmailAuthProvider.credential(
-      props.route.params.email,
-      currentPassword,
-    );
-    user
-      .reauthenticateWithCredential(cred) // first it will reauthenticate fresh
-      .then(() => {
-        user
-          .updatePassword(newPassword)
-          .then(() => {
-            Alert.alert('Password Changed Successfully');
-            props.navigation.goBack();
-          })
-          .catch(err => {
-            Alert.alert(err.message);
-            props.navigation.goBack();
-          });
-      })
-      .catch(err => {
-        console.log(err);
-        errorMessagesHandler('currentPassword', 'Invalid Current Password');
-        setLoading(false);
-      });
+    // const user = firebase.auth().currentUser;
+    firebase.auth().onAuthStateChanged(user => {
+      const cred = firebase.auth.EmailAuthProvider.credential(
+        props.route.params.email,
+        currentPassword,
+      );
+      user
+        .reauthenticateWithCredential(cred) // first it will reauthenticate fresh
+        .then(() => {
+          user
+            .updatePassword(newPassword)
+            .then(() => {
+              setModalState(true);
+              showToast(ToastGenerator('Password Changed Successfully ', true));
+              // toastRef.current.show('Password set', 3000);
+              setTimeout(() => {
+                props.navigation.goBack();
+              }, 3000);
+            })
+            .catch(() => {
+              setModalState(false);
+              showToast(
+                ToastGenerator('Password Change Failed ', false),
+                'red',
+              );
+              setTimeout(() => {
+                setLoading(false);
+              }, 2000);
+            });
+        })
+        .catch(err => {
+          console.log(err);
+          errorMessagesHandler('currentPassword', 'Invalid Current Password');
+          setLoading(false);
+        });
+    });
   };
 
   const PasswordsChecker = () => {
@@ -76,11 +97,16 @@ const ResetPassword = props => {
       setCurrentPasswordErrMsg('');
     }
   };
+
+  const showToast = (message, type = 'black', duration = 3000) => {
+    setToastColor(type);
+    toastRef.current.show(message, duration);
+  };
   return (
     <View style={styles.container}>
       <MaterialMessageTextbox
         text1="Current Password:"
-        textInput1="Enter your Current password"
+        textInput1="Enter your current password"
         error={currentPasswordErrMsg ? true : false}
         errorMessage={currentPasswordErrMsg ? currentPasswordErrMsg : null}
         style={styles.PasswordsInput}
@@ -103,7 +129,7 @@ const ResetPassword = props => {
         value={newPassword}
       />
       <MaterialMessageTextbox
-        text1="Re-enter New Password"
+        text1="Confirm New Password"
         textInput1="Enter your new password again"
         error={newPasswordAgainErrMsg ? true : false}
         errorMessage={newPasswordAgainErrMsg ? newPasswordAgainErrMsg : null}
@@ -120,6 +146,13 @@ const ResetPassword = props => {
         style={styles.signupButton}
         isLoading={loading}
       />
+      <Modal style={styles.modal} isVisible={modalState}>
+        <Toast
+          ref={toastRef}
+          style={{backgroundColor: toastColor, borderRadius: 10}}
+          position="center"
+        />
+      </Modal>
     </View>
   );
 };
@@ -143,8 +176,14 @@ const styles = StyleSheet.create({
   signupButton: {
     width: '75%',
     height: 50,
-    marginTop: '6%',
+    marginTop: '2%',
+  },
+  modal: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
-export default ResetPassword;
+export default React.memo(ResetPassword);

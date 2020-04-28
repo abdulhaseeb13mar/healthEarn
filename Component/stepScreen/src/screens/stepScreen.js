@@ -24,6 +24,8 @@ import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
+import PushNotification from 'react-native-push-notification';
+import {LocalNotificationSchedule} from '../../../../Notifications/LocalPushNotification';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -45,6 +47,14 @@ const Untitled = props => {
     setIsLoading(true);
     locationAuthorize();
     CheckLastSyncDate();
+    PushNotification.configure({
+      onNotification: notification => {
+        console.log('LOCAL NOTIFICATION=> ', notification);
+        CheckLastSyncDate();
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
     return () => {
       GoogleFit.unsubscribeListeners();
     };
@@ -250,16 +260,11 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            {/* <MaterialButtonViolet
+            <MaterialButtonViolet
               text="Send Notification"
               onPress={() => LocalNotificationSchedule()}
               style={styles.materialButtonViolet}
             />
-            <MaterialButtonViolet
-              text="Date"
-              onPress={() => testingDates()}
-              style={styles.materialButtonViolet}
-            /> */}
           </View>
         </View>
 
@@ -281,9 +286,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     marginTop: '5%',
-    // borderColor: 'red',
-    // borderStyle: 'solid',
-    // borderWidth: 1,
   },
   innerContainer: {
     marginTop: 50,
