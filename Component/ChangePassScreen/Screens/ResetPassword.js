@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {View, StyleSheet} from 'react-native';
 import MaterialMessageTextbox from '../../LoginScreen/src/components/MaterialMessageTextbox';
 import MaterialButtonViolet from '../../LoginScreen/src/components/MaterialButtonViolet';
 import firebase from '../../../firebase';
@@ -27,7 +27,6 @@ const ResetPassword = props => {
       setLoading(false);
       return;
     }
-    // const user = firebase.auth().currentUser;
     firebase.auth().onAuthStateChanged(user => {
       const cred = firebase.auth.EmailAuthProvider.credential(
         props.route.params.email,
@@ -41,7 +40,6 @@ const ResetPassword = props => {
             .then(() => {
               setModalState(true);
               showToast(ToastGenerator('Password Changed Successfully ', true));
-              // toastRef.current.show('Password set', 3000);
               setTimeout(() => {
                 props.navigation.goBack();
               }, 3000);

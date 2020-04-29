@@ -10,6 +10,7 @@ import {
   Button,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
+import {useNetInfo} from '@react-native-community/netinfo';
 import moment from 'moment';
 import AnimateNumber from 'react-native-countup';
 import Modal from 'react-native-modal';
@@ -25,7 +26,7 @@ import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorag
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
 import PushNotification from 'react-native-push-notification';
-import {LocalNotificationSchedule} from '../../../../Notifications/LocalPushNotification';
+import {CheckInternet} from '../../../../utils/checkInternet';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -42,6 +43,7 @@ const Untitled = props => {
   const [dataDate, setDataDate] = useState('');
   const [lastSync, setLastSync] = useState('');
   const toastRef = useRef(null);
+  const netInfo = useNetInfo();
 
   useEffect(() => {
     setIsLoading(true);
@@ -261,11 +263,13 @@ const Untitled = props => {
               style={styles.materialButtonViolet}
             />
             <MaterialButtonViolet
-              text="Send Notification"
-              onPress={() => LocalNotificationSchedule()}
+              text="Check Internet"
+              onPress={() => CheckInternet()}
               style={styles.materialButtonViolet}
             />
           </View>
+          <Text>Type: {netInfo.type}</Text>
+          <Text>Is Connected? {netInfo.isConnected.toString()}</Text>
         </View>
 
         {locationAllowed ? null : (
