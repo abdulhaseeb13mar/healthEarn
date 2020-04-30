@@ -6,15 +6,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import {
-  Text,
-  Dimensions,
-  StyleSheet,
-  View,
-  AsyncStorage,
-  Image,
-  ImageBackground,
-} from 'react-native';
+import {Text, Dimensions, StyleSheet, View, AsyncStorage} from 'react-native';
 import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
@@ -76,6 +68,7 @@ const HomeNavigations = props => {
           {homeProps => (
             <StepScreen
               {...homeProps}
+              hasInternet={props.hasInternet}
               currentUser={props.currentUser}
               userToken={() => props.userToken()}
             />
