@@ -273,11 +273,11 @@ const Untitled = props => {
               isDisabled={isDisabledRefreshBtn}
               style={styles.materialButtonViolet}
             />
-            <MaterialButtonViolet
+            {/* <MaterialButtonViolet
               text="Check Internet"
               onPress={() => CheckInternet()}
               style={styles.materialButtonViolet}
-            />
+            /> */}
           </View>
         </View>
         {locationAllowed ? null : (
