@@ -2,8 +2,12 @@ import {Alert} from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import localScopes from '../../../../scopes';
 import {requestLocationPermissionFunc} from '../components/locPermission';
+import {CheckInternet} from '../../../../utils/checkInternet';
 
 export const locationAuthorizeFunc = async () => {
+  if ((await CheckInternet()) === false) {
+    return 'noNet';
+  }
   let loc_perm;
   const options = {
     scopes: [

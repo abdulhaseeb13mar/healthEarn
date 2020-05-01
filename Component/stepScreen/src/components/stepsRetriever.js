@@ -1,6 +1,10 @@
 import GoogleFit from 'react-native-google-fit';
+import {CheckInternet} from '../../../../utils/checkInternet';
 
 export const stepsRetrieverFunc = async retrieveOptions => {
+  if ((await CheckInternet()) === false) {
+    return false;
+  }
   let steps = 0;
   await GoogleFit.getDailyStepCountSamples(retrieveOptions)
     .then(res => {

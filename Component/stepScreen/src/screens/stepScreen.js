@@ -6,8 +6,6 @@ import {
   Text,
   SafeAreaView,
   KeyboardAvoidingView,
-  Dimensions,
-  Button,
 } from 'react-native';
 import GoogleFit from 'react-native-google-fit';
 import moment from 'moment';
@@ -24,8 +22,9 @@ import {locationAuthorizeFunc} from '../components/locationAuthorize';
 import {GetLastSyncAsyncStorageFunc} from '../components/getLastSync(asyncStorage)';
 import {checkDateDifferenceFunc} from '../components/DifferenceDates';
 import {getUserLastSync, setUserLastSync} from '../../../Firebase/index';
-
-const HEIGHT = Dimensions.get('window').height;
+import PushNotification from 'react-native-push-notification';
+import {CheckInternet} from '../../../../utils/checkInternet';
+import BottomTicker from '../../../../utils/bottomTicker';
 
 const Untitled = props => {
   const [count, setCount] = useState(0);
@@ -43,14 +42,31 @@ const Untitled = props => {
 
   useEffect(() => {
     setIsLoading(true);
-    locationAuthorize();
-    CheckLastSyncDate();
+    componentsDidMountFunctions();
+    PushNotification.configure({
+      onNotification: notification => {
+        CheckLastSyncDate();
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
     return () => {
       GoogleFit.unsubscribeListeners();
     };
-  }, []);
+  }, [props.hasInternet]);
+
+  const componentsDidMountFunctions = async () => {
+    if ((await CheckInternet()) === false) {
+      return;
+    }
+    await locationAuthorize();
+    await CheckLastSyncDate();
+  };
 
   const CheckLastSyncDate = async () => {
+    if ((await CheckInternet()) === false) {
+      return;
+    }
     let lastServerSyncDate = await getUserLastSync(props.currentUser.name);
     console.log(
       'server date: ',
@@ -70,13 +86,11 @@ const Untitled = props => {
         lastSyncDate,
       );
     }
-
     console.log('Async Date: ', lastSyncDate);
     const diff = checkDateDifferenceFunc(
       moment(lastSyncDate).format('YYYY-MM-DD'),
       moment().format('YYYY-MM-DD'),
     );
-    console.log('mounted: ', lastSyncDate, diff);
     if (diff <= 1) {
       return;
     }
@@ -86,6 +100,9 @@ const Untitled = props => {
   //-----------------authorize location--------------------------
   const locationAuthorize = async () => {
     const loc_perm = await locationAuthorizeFunc();
+    if (loc_perm === 'noNet') {
+      return;
+    }
     setLocationAllowed(loc_perm);
     stepsRetriever();
   };
@@ -100,11 +117,17 @@ const Untitled = props => {
       ).toISOString(),
       endDate: new Date().toISOString(),
     });
-    setCount(steps);
-    setTimeout(() => {
+    if (steps === false) {
       setIsDisabledRefreshBtn(false);
-    }, 3500);
-    setIsLoading(false);
+      setIsLoading(false);
+      return;
+    } else {
+      setCount(steps);
+      setTimeout(() => {
+        setIsDisabledRefreshBtn(false);
+      }, 3500);
+      setIsLoading(false);
+    }
   };
 
   const publishDataHandler = async date => {
@@ -242,7 +265,7 @@ const Untitled = props => {
             </Text>
             <MaterialButtonViolet
               text="Refresh"
-              onPress={() => {
+              onPress={async () => {
                 setIsLoading(true);
                 setIsDisabledRefreshBtn(true);
                 stepsRetriever();
@@ -251,25 +274,18 @@ const Untitled = props => {
               style={styles.materialButtonViolet}
             />
             {/* <MaterialButtonViolet
-              text="Send Notification"
-              onPress={() => LocalNotificationSchedule()}
-              style={styles.materialButtonViolet}
-            />
-            <MaterialButtonViolet
-              text="Date"
-              onPress={() => testingDates()}
+              text="Check Internet"
+              onPress={() => CheckInternet()}
               style={styles.materialButtonViolet}
             /> */}
           </View>
         </View>
-
         {locationAllowed ? null : (
-          <View style={styles.popup}>
-            <Text style={styles.popupText}>
-              You have not allowed Location Permission!{' '}
-            </Text>
-            <Button title="ALLOW" color="#3F51B5" />
-          </View>
+          <BottomTicker
+            message="You have not allowed Location Permission!"
+            type="loc"
+            onPress={locationAuthorize}
+          />
         )}
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -281,9 +297,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     marginTop: '5%',
-    // borderColor: 'red',
-    // borderStyle: 'solid',
-    // borderWidth: 1,
   },
   innerContainer: {
     marginTop: 50,
@@ -330,24 +343,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignSelf: 'center',
     elevation: 13,
-  },
-  popup: {
-    position: 'absolute',
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: 60,
-    backgroundColor: 'black',
-    color: 'white',
-    bottom: 0,
-    top: HEIGHT - 60,
-    opacity: 0.8,
-  },
-  popupText: {
-    color: 'white',
-    fontSize: 14,
   },
   hamburger: {
     marginLeft: '5%',
