@@ -6,15 +6,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import {
-  Text,
-  Dimensions,
-  StyleSheet,
-  View,
-  AsyncStorage,
-  Image,
-  ImageBackground,
-} from 'react-native';
+import {Text, Dimensions, StyleSheet, View, AsyncStorage} from 'react-native';
 import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // import HeartRateScreen from './Component/HeartRateScreen/HeartRate';
@@ -76,6 +68,7 @@ const HomeNavigations = props => {
           {homeProps => (
             <StepScreen
               {...homeProps}
+              hasInternet={props.hasInternet}
               currentUser={props.currentUser}
               userToken={() => props.userToken()}
             />
@@ -110,6 +103,20 @@ const HomeNavigations = props => {
           )}
         </Drawer.Screen> */}
         <Drawer.Screen
+          name="Change Password"
+          options={{
+            drawerIcon: () => <Icon name="lock-reset" size={27} />,
+            unmountOnBlur: true,
+            gestureEnabled: false,
+          }}>
+          {changePassProps => (
+            <SettingScreen
+              currentUser={props.currentUser}
+              {...changePassProps}
+            />
+          )}
+        </Drawer.Screen>
+        {/* <Drawer.Screen
           name="Settings"
           options={{
             drawerIcon: () => <Icon name="settings" size={27} />,
@@ -123,7 +130,7 @@ const HomeNavigations = props => {
               userToken={() => props.userToken()}
             />
           )}
-        </Drawer.Screen>
+        </Drawer.Screen> */}
       </Drawer.Navigator>
     </>
   );
@@ -142,14 +149,7 @@ const AvatarTextHandler = name => {
 const CustomNavigator = props => {
   return (
     <DrawerContentScrollView {...props}>
-      <ImageBackground
-        source={require('./Component/stepScreen/src/assets/images/drawerback.jpg')}
-        style={styles.header}>
-        {/* <Image
-          source={require('./Component/stepScreen/src/assets/images/blankProfile.png')}
-          resizeMode="contain"
-          style={styles.image}
-        /> */}
+      <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Text style={styles.avatarText}>
             {AvatarTextHandler(props.currentUser.name)}
@@ -163,7 +163,7 @@ const CustomNavigator = props => {
             {props.currentUser.email}
           </Text>
         </View>
-      </ImageBackground>
+      </View>
       <DrawerItemList {...props} />
       <DrawerItem
         style={{
@@ -212,29 +212,21 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    backgroundColor: 'black',
   },
   headerEmail: {
     color: 'white',
     fontSize: 14,
-    backgroundColor: 'black',
-  },
-  image: {
-    marginLeft: '4%',
-    width: '25%',
-    height: 100,
-    borderRadius: 200,
   },
   avatarContainer: {
     marginLeft: '4%',
     // height: '35%',
-    width: '25%',
+    width: '23%',
     aspectRatio: 1,
-    backgroundColor: '#3F51B5',
+    backgroundColor: 'white',
     borderRadius: 50,
   },
   avatarText: {
-    color: 'white',
+    color: '#3F51B5',
     fontSize: 36,
     textAlign: 'center',
     textAlignVertical: 'center',
