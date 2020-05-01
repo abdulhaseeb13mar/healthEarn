@@ -10,6 +10,7 @@
     "clean-and-run": "cd android && gradlew clean && cd .. && react-native run-android",
     "nodeify": "rn-nodeify --install --hack ",
     "build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cd android && gradlew assembleRelease && cd ..",
+    "generate-apk": "npm run clean && npm run install && npm run nodeify && npm run build",
     "test": "jest",
     "lint": "eslint ."
   },
