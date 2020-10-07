@@ -69,7 +69,7 @@ export const publishData = async (
     // Attach the payload.
     await progress(70, 'Publishing data packet...');
     await faker();
-    await Mam.attach(message.payload, message.address, 3, 10);
+    await Mam.attach(message.payload, message.address, 3, 9);
     await progress(80, 'Backing up keys...');
     await faker();
     SetLastSyncAsyncStorageFunc(moment(packet.time).format());

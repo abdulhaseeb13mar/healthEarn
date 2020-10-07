@@ -81,6 +81,8 @@ project.ext.react = [
     nodeExecutableAndArgs: ["node", "--max-old-space-size=6144"]
 ]
 
+rootProject.ext.set("fitnessVersion", "18.0.0")
+1
 apply from: "../../node_modules/react-native/react.gradle"
 
 project.ext.vectoricons = [
