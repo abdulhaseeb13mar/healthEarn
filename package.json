@@ -48,7 +48,7 @@
     "querystring": "^0.2.0",
     "querystring-es3": "~0.2.0",
     "react": "16.9.0",
-    "react-native": "0.61.5",
+    "react-native": "0.62.3",
     "react-native-countup": "0.0.2",
     "react-native-crypto": "^2.2.0",
     "react-native-easy-toast": "^1.2.0",
