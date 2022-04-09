@@ -40,7 +40,7 @@
     "https-browserify": "0.0.1",
     "levelup": "^4.3.2",
     "main": "^1000.0.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "path-browserify": "0.0.0",
     "process": "^0.11.10",
     "punycode": "^1.2.4",
